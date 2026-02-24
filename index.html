@@ -1,0 +1,2476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PIXEL REAPER X</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════
+   PIXEL REAPER X  |  Design System
+   Aesthetic: Brutal pixel-retro-futurism
+   Dark, geometric, neon-cut UI. No softness.
+════════════════════════════════════════════════════════ */
+:root{
+  --bg:#06060e;--panel:#0b0b18;--border:#1e1e38;--border2:#2c2c50;
+  --txt:#bbbbd8;--dim:#484868;--dim2:#30304a;
+  --red:#ff2a4a;--blue:#2970ff;--gold:#ffcc28;
+  --green:#28e868;--purple:#a030ff;--orange:#ff6818;
+  --cyan:#18d8ff;--pink:#ff28b0;--white:#ffffff;
+  --font-px:'Press Start 2P',monospace;
+  --font-vt:'VT323',monospace;
+  --font-ui:'Rajdhani',sans-serif;
+  --CW:960px;--CH:540px;
+}
+*{margin:0;padding:0;box-sizing:border-box;image-rendering:pixelated;}
+html,body{width:100%;min-height:100vh;background:var(--bg);color:var(--txt);
+  font-family:var(--font-ui);overflow:hidden;user-select:none;}
+
+/* ── Screens ── */
+.scr{position:fixed;inset:0;display:none;flex-direction:column;
+  align-items:center;justify-content:center;background:var(--bg);z-index:20;}
+.scr.on{display:flex;}
+
+/* ── BG grid ── */
+.grid-bg{position:fixed;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(40,40,80,.12) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(40,40,80,.12) 1px,transparent 1px);
+  background-size:48px 48px;animation:gdrift 24s linear infinite;}
+@keyframes gdrift{from{background-position:0 0}to{background-position:48px 48px}}
+
+/* ── Title ── */
+.title{font-family:var(--font-px);font-size:clamp(18px,2.8vw,34px);
+  letter-spacing:6px;color:#fff;
+  text-shadow:0 0 24px var(--red),0 0 60px var(--blue);
+  animation:tpulse 2.8s ease-in-out infinite;}
+@keyframes tpulse{
+  0%,100%{text-shadow:0 0 18px var(--red),0 0 50px var(--blue);}
+  50%{text-shadow:0 0 38px var(--red),0 0 80px var(--blue),0 0 110px rgba(255,255,255,.15);}
+}
+.subtitle{font-family:var(--font-vt);font-size:20px;letter-spacing:4px;
+  color:var(--dim);margin-top:4px;margin-bottom:32px;}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-px);
+  font-size:8px;letter-spacing:1px;padding:10px 20px;border:2px solid currentColor;
+  background:transparent;cursor:pointer;transition:all .13s;white-space:nowrap;
+  position:relative;overflow:hidden;}
+.btn::before{content:'';position:absolute;inset:0;background:currentColor;
+  opacity:0;transition:opacity .13s;}
+.btn:hover::before{opacity:.12;}
+.btn:active{transform:scale(.97);}
+.btn-red{color:var(--red)}.btn-blue{color:var(--blue)}.btn-gold{color:var(--gold)}
+.btn-green{color:var(--green)}.btn-purple{color:var(--purple)}.btn-dim{color:var(--dim);font-size:6px;padding:7px 13px;}
+.btn-lg{font-size:10px;padding:13px 26px;}
+.btn-sm{font-size:6px;padding:6px 11px;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;}
+
+/* ── Panel ── */
+.panel{background:var(--panel);border:1px solid var(--border);padding:14px;}
+.panel-title{font-family:var(--font-px);font-size:6px;color:var(--dim);
+  letter-spacing:2px;border-bottom:1px solid var(--border);padding-bottom:7px;margin-bottom:10px;}
+
+/* ── Rarity ── */
+.rc{color:#888090}.ru{color:var(--green)}.rr{color:var(--blue)}
+.re{color:var(--purple)}.rl{color:var(--gold)}.rm{color:var(--red);animation:rpulse .7s alternate infinite;}
+@keyframes rpulse{from{text-shadow:0 0 4px var(--red)}to{text-shadow:0 0 14px var(--red),0 0 28px var(--red)}}
+.rdot{display:inline-block;width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.rdc{background:#888090}.rdu{background:var(--green)}.rdr{background:var(--blue)}
+.rde{background:var(--purple)}.rdl{background:var(--gold)}.rdm{background:var(--red);}
+
+/* ── Bars ── */
+.bar-wrap{width:100%;height:8px;background:#080810;border:1px solid #111120;position:relative;overflow:hidden;}
+.bar-fill{height:100%;transition:width .1s linear;}
+.barhp{background:linear-gradient(90deg,#c01818,#ff4040);}
+.baren{background:linear-gradient(90deg,#1038c0,#3d80ff);}
+.baram{background:linear-gradient(90deg,#906000,#ffbe18);}
+.barxp{background:linear-gradient(90deg,var(--purple),var(--cyan));}
+.bar-val{font-family:var(--font-vt);font-size:12px;color:#555568;
+  position:absolute;right:3px;top:0;line-height:8px;}
+
+/* ══════ MENU ══════ */
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  width:480px;margin:0 0 16px;}
+.mode-card{border:1px solid var(--border2);background:var(--panel);padding:18px 16px;
+  cursor:pointer;transition:all .14s;text-align:center;position:relative;}
+.mode-card:hover{border-color:var(--blue);background:#0d0d22;transform:translateY(-2px);}
+.mode-card .mc-icon{font-size:26px;margin-bottom:6px;display:block;}
+.mode-card .mc-name{font-family:var(--font-px);font-size:7px;color:#fff;margin-bottom:3px;}
+.mode-card .mc-desc{font-family:var(--font-ui);font-size:12px;color:var(--dim);}
+
+/* ══════ LOBBY ══════ */
+#scr-lobby .lob-grid{display:flex;gap:12px;width:960px;align-items:flex-start;}
+.lob-panel{background:var(--panel);border:1px solid var(--border);padding:12px;flex:1;}
+.lob-panel h3{font-family:var(--font-px);font-size:6px;color:var(--dim);letter-spacing:2px;
+  border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:8px;}
+
+.item-row{display:flex;align-items:center;gap:8px;padding:6px 7px;
+  border:1px solid var(--border);background:#07070f;margin-bottom:5px;position:relative;}
+.item-row .ir-icon{font-size:17px;min-width:22px;text-align:center;}
+.item-row .ir-info{flex:1;}
+.item-row .ir-name{font-family:var(--font-px);font-size:5.5px;color:#fff;margin-bottom:2px;}
+.item-row .ir-desc{font-size:11px;color:var(--dim);font-family:var(--font-ui);}
+.item-row .ir-badge{font-family:var(--font-px);font-size:4.5px;padding:2px 5px;
+  border:1px solid currentColor;white-space:nowrap;margin-left:auto;}
+
+.mod-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;
+  border:1px solid var(--border2);font-family:var(--font-px);font-size:5px;
+  color:var(--txt);margin:2px;background:#0a0a16;}
+.mod-icon{font-size:13px;}
+
+/* ══════ IN-GAME HUD ══════ */
+#hud{position:fixed;top:0;left:0;right:0;z-index:50;
+  pointer-events:none;display:none;}
+#hud.on{display:block;}
+.hud-top{display:flex;justify-content:space-between;align-items:flex-start;
+  padding:8px 12px 0;width:100%;}
+.hud-panel{background:rgba(8,8,18,.88);border:1px solid var(--border);
+  padding:7px 10px;min-width:200px;backdrop-filter:blur(2px);}
+.hud-name{font-family:var(--font-px);font-size:5.5px;color:var(--dim);
+  margin-bottom:5px;letter-spacing:1px;}
+.hud-bar{margin-bottom:3px;}
+.hud-wep{display:flex;align-items:center;gap:5px;margin-top:5px;flex-wrap:wrap;}
+.hud-wep-name{font-family:var(--font-px);font-size:5px;color:var(--gold);}
+.hud-statuses{display:flex;gap:2px;margin-top:3px;flex-wrap:wrap;}
+.stat-pip{font-size:10px;padding:0 2px;border-radius:1px;}
+.hud-center{flex:1;text-align:center;padding:0 10px;}
+.hud-score{font-family:var(--font-px);font-size:15px;color:#fff;
+  text-shadow:0 0 8px var(--blue);}
+.hud-wave{font-family:var(--font-px);font-size:5px;color:var(--dim);margin-top:2px;}
+.hud-combo{font-family:var(--font-px);font-size:7px;margin-top:3px;min-height:12px;}
+.hud-modifier{font-family:var(--font-px);font-size:4.5px;color:var(--purple);
+  margin-top:3px;letter-spacing:1px;}
+.hud-enemy{text-align:right;}
+.hud-enemy .hud-wep{justify-content:flex-end;}
+.hud-enemy .hud-name{color:#e05050;}
+
+/* ── Ability bar ── */
+.hud-bottom{position:fixed;bottom:0;left:0;right:0;z-index:50;pointer-events:none;
+  display:flex;justify-content:space-between;align-items:flex-end;
+  padding:0 12px 8px;}
+.ab-row{display:flex;gap:5px;}
+.ab-slot{width:50px;height:50px;border:2px solid var(--border2);
+  background:rgba(8,8,18,.9);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;position:relative;font-size:17px;}
+.ab-key{position:absolute;top:2px;left:3px;font-family:var(--font-px);
+  font-size:4.5px;color:var(--dim);}
+.ab-label{position:absolute;bottom:2px;font-family:var(--font-px);
+  font-size:3.8px;color:var(--dim);text-align:center;line-height:1.2;}
+.ab-cd{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.78);
+  transition:height .1s;}
+.ab-slot.ab-ready{border-color:rgba(255,255,255,.15);}
+.ab-slot.ab-oncd{opacity:.65;}
+.ab-slot.ab-active{border-color:var(--purple);box-shadow:0 0 8px var(--purple)44;}
+.controls-hint{font-family:var(--font-px);font-size:5px;color:var(--dim2);
+  line-height:2.1;pointer-events:none;}
+
+/* ── Kill feed ── */
+#kill-feed{position:fixed;right:10px;top:50%;transform:translateY(-50%);
+  pointer-events:none;z-index:90;display:flex;flex-direction:column;gap:2px;max-width:220px;}
+.kf-item{font-family:var(--font-vt);font-size:16px;text-align:right;
+  opacity:1;transition:opacity 2.2s;}
+
+/* ── Overlays ── */
+#ovl-dmg{position:fixed;inset:0;pointer-events:none;z-index:200;
+  background:rgba(255,0,0,0);transition:background .1s;}
+#ovl-slow{position:fixed;inset:0;pointer-events:none;z-index:160;opacity:0;
+  transition:opacity .3s;
+  background:radial-gradient(ellipse at center,transparent 30%,rgba(80,20,170,.65) 100%);}
+#ovl-fog{position:fixed;inset:0;pointer-events:none;z-index:155;opacity:0;transition:opacity .5s;}
+#ovl-invis{position:fixed;inset:0;pointer-events:none;z-index:158;opacity:0;transition:opacity .3s;
+  background:rgba(20,60,80,.7);}
+#shake-wrap{position:fixed;inset:0;pointer-events:none;z-index:300;}
+
+/* ── Canvas wrap ── */
+#game-canvas-wrap{position:fixed;inset:0;display:none;align-items:center;justify-content:center;}
+#game-canvas-wrap.on{display:flex;}
+#gc{display:block;cursor:crosshair;border:1px solid var(--border);
+  box-shadow:0 0 40px rgba(41,112,255,.12);}
+
+/* ══════ STATS SCREEN ══════ */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  width:480px;margin:16px 0;}
+.stat-card{background:var(--panel);border:1px solid var(--border);padding:12px 14px;
+  display:flex;flex-direction:column;gap:4px;}
+.stat-card .sc-label{font-family:var(--font-px);font-size:5px;color:var(--dim);}
+.stat-card .sc-val{font-family:var(--font-vt);font-size:28px;color:#fff;}
+.stat-card .sc-sub{font-size:12px;color:var(--dim);}
+
+/* ══════ PROGRESSION ══════ */
+.prog-section{width:480px;margin-top:12px;}
+.prog-label{font-family:var(--font-px);font-size:5px;color:var(--dim);margin-bottom:4px;}
+.unlock-grid{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.unlock-badge{font-family:var(--font-px);font-size:4.5px;padding:4px 7px;
+  border:1px solid var(--border);color:var(--dim);}
+.unlock-badge.earned{border-color:var(--gold);color:var(--gold);}
+.unlock-badge.new{border-color:var(--green);color:var(--green);animation:newbadge 1s ease-in-out infinite alternate;}
+@keyframes newbadge{from{box-shadow:none}to{box-shadow:0 0 8px var(--green);}}
+
+/* ══════ DIFF SELECT ══════ */
+.diff-row{display:flex;gap:6px;margin:10px 0;}
+.diff-btn{font-family:var(--font-px);font-size:6px;padding:7px 13px;
+  border:1px solid var(--border2);background:transparent;cursor:pointer;
+  color:var(--dim);transition:all .13s;}
+.diff-btn.on{border-color:var(--gold);color:var(--gold);}
+.diff-btn[data-d=easy].on{border-color:var(--green);color:var(--green);}
+.diff-btn[data-d=hard].on{border-color:var(--orange);color:var(--orange);}
+.diff-btn[data-d=extreme].on{border-color:var(--red);color:var(--red);animation:rpulse .7s alternate infinite;}
+
+/* ══════ LANG TOGGLE ══════ */
+.lang-toggle{position:fixed;top:10px;right:12px;z-index:500;
+  display:flex;gap:4px;}
+.lang-btn{font-family:var(--font-px);font-size:6px;padding:5px 9px;
+  border:1px solid var(--border2);background:transparent;cursor:pointer;color:var(--dim);}
+.lang-btn.on{border-color:var(--blue);color:var(--blue);}
+
+/* ══════ GAME OVER RESULTS ══════ */
+.result-title{font-family:var(--font-px);font-size:clamp(16px,2.5vw,28px);
+  margin-bottom:6px;letter-spacing:3px;}
+.result-score{font-family:var(--font-px);font-size:11px;color:var(--gold);margin-bottom:4px;}
+.result-wave{font-family:var(--font-px);font-size:6px;color:var(--dim);margin-bottom:4px;}
+.result-xp{font-family:var(--font-px);font-size:7px;color:var(--green);margin-bottom:20px;}
+
+/* ══════ RESPONSIVE ══════ */
+@media(max-width:980px){
+  :root{--CW:100vw;--CH:56.25vw;}
+  .lob-grid{flex-direction:column!important;width:100vw!important;overflow-y:auto;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LANGUAGE BUTTONS ═══ -->
+<div class="lang-toggle">
+  <button class="lang-btn on" data-l="en" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" data-l="tr" onclick="setLang('tr')">TR</button>
+</div>
+
+<!-- ═══ SCREEN: MENU ═══ -->
+<div class="scr on" id="scr-menu">
+  <div class="grid-bg"></div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;">
+    <div class="title">PIXEL REAPER X</div>
+    <div class="subtitle" data-i="tagline">CHAOS ARENA — EVERY RUN DIFFERENT</div>
+
+    <div class="menu-grid">
+      <div class="mode-card" onclick="startFlow('vs-ai')">
+        <span class="mc-icon">🤖</span>
+        <div class="mc-name" data-i="vsai">VS AI</div>
+        <div class="mc-desc" data-i="vsai_desc">Fight an adaptive NPC opponent</div>
+      </div>
+      <div class="mode-card" onclick="showScr('scr-prog')">
+        <span class="mc-icon">★</span>
+        <div class="mc-name" data-i="progress">PROGRESSION</div>
+        <div class="mc-desc" data-i="progress_desc">XP, levels & cosmetic unlocks</div>
+      </div>
+      <div class="mode-card" onclick="showScr('scr-codex')">
+        <span class="mc-icon">📖</span>
+        <div class="mc-name" data-i="codex">CODEX</div>
+        <div class="mc-desc" data-i="codex_desc">All 100 weapons & 100 abilities</div>
+      </div>
+      <div class="mode-card" onclick="showScr('scr-settings')">
+        <span class="mc-icon">⚙️</span>
+        <div class="mc-name" data-i="settings">SETTINGS</div>
+        <div class="mc-desc" data-i="settings_desc">Controls, display & language</div>
+      </div>
+    </div>
+
+    <div style="font-family:var(--font-px);font-size:5px;color:var(--dim2);margin-top:4px;">
+      <span data-i="hiscore">HI-SCORE</span>: <span id="menu-hi">—</span>
+      &nbsp;|&nbsp; LV <span id="menu-lv">1</span>
+      &nbsp;|&nbsp; v1.0.0
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: LOBBY ═══ -->
+<div class="scr" id="scr-lobby">
+  <div class="grid-bg"></div>
+  <div style="position:relative;z-index:2;width:100%;display:flex;flex-direction:column;align-items:center;">
+    <div style="font-family:var(--font-px);font-size:9px;color:var(--gold);margin-bottom:4px;letter-spacing:2px;">
+      🎲 <span data-i="rolling">ROLLING YOUR LOADOUT...</span>
+    </div>
+    <div style="font-family:var(--font-px);font-size:5.5px;color:var(--dim);margin-bottom:14px;" id="lob-theme-label">MAP: ???</div>
+
+    <div class="lob-grid" id="lob-grid">
+      <!-- Player loadout -->
+      <div class="lob-panel" style="flex:1.3;">
+        <h3 data-i="your_weapons">YOUR WEAPONS</h3>
+        <div id="lob-weapons"></div>
+        <h3 style="margin-top:10px;" data-i="your_abilities">YOUR ABILITIES</h3>
+        <div id="lob-abilities"></div>
+      </div>
+
+      <!-- Map + modifiers -->
+      <div class="lob-panel" style="flex:1;">
+        <h3 data-i="map_preview">MAP PREVIEW</h3>
+        <canvas id="map-prev" width="230" height="90" style="width:100%;border:1px solid var(--border);display:block;"></canvas>
+        <h3 style="margin-top:10px;" data-i="round_mods">ROUND MODIFIERS</h3>
+        <div id="lob-mods" style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;"></div>
+        <h3 style="margin-top:10px;" data-i="difficulty">DIFFICULTY</h3>
+        <div class="diff-row" id="lob-diff-row">
+          <button class="diff-btn" data-d="easy" onclick="setDiff('easy')" data-i="easy">EASY</button>
+          <button class="diff-btn on" data-d="normal" onclick="setDiff('normal')" data-i="normal">NORMAL</button>
+          <button class="diff-btn" data-d="hard" onclick="setDiff('hard')" data-i="hard">HARD</button>
+          <button class="diff-btn" data-d="extreme" onclick="setDiff('extreme')" data-i="extreme">EXTREME</button>
+        </div>
+      </div>
+
+      <!-- Enemy -->
+      <div class="lob-panel">
+        <h3 data-i="enemy_loadout">ENEMY LOADOUT</h3>
+        <div id="lob-enemy"></div>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:12px;">
+      <button class="btn btn-dim" onclick="reroll()" id="reroll-btn">
+        🎲 <span data-i="reroll">REROLL</span> (<span id="rerolls-left">1</span>)
+      </button>
+      <button class="btn btn-green btn-lg" onclick="beginRound()">► <span data-i="fight">FIGHT!</span></button>
+      <button class="btn btn-dim" onclick="showScr('scr-menu')">← <span data-i="back">BACK</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CANVAS WRAP ═══ -->
+<div id="game-canvas-wrap">
+  <canvas id="gc" width="960" height="540"></canvas>
+</div>
+
+<!-- ═══ HUD (overlaid on canvas) ═══ -->
+<div id="hud">
+  <div class="hud-top">
+    <!-- Player HUD -->
+    <div class="hud-panel">
+      <div class="hud-name" data-i="player">▶ PLAYER</div>
+      <div class="hud-bar"><div class="bar-wrap"><div class="bar-fill barhp" id="ph-hp" style="width:100%"></div><div class="bar-val" id="pv-hp">100</div></div></div>
+      <div class="hud-bar"><div class="bar-wrap"><div class="bar-fill baren" id="ph-en" style="width:100%"></div><div class="bar-val" id="pv-en">100</div></div></div>
+      <div class="hud-bar"><div class="bar-wrap"><div class="bar-fill baram" id="ph-am" style="width:100%"></div><div class="bar-val" id="pv-am">30</div></div></div>
+      <div class="hud-wep"><div class="rdot" id="p-wdot"></div><span class="hud-wep-name" id="p-wname">—</span></div>
+      <div class="hud-statuses" id="p-stats"></div>
+    </div>
+
+    <!-- Center -->
+    <div class="hud-center">
+      <div class="hud-score" id="hud-score">00000</div>
+      <div class="hud-wave" id="hud-wave">WAVE 1</div>
+      <div class="hud-combo" id="hud-combo"></div>
+      <div class="hud-modifier" id="hud-mod"></div>
+    </div>
+
+    <!-- Enemy HUD -->
+    <div class="hud-panel hud-enemy">
+      <div class="hud-name">ENEMY ◀</div>
+      <div class="hud-bar"><div class="bar-wrap"><div class="bar-fill barhp" id="eh-hp" style="width:100%"></div><div class="bar-val" id="ev-hp">150</div></div></div>
+      <div class="hud-bar"><div class="bar-wrap"><div class="bar-fill baram" id="eh-am" style="width:100%"></div><div class="bar-val" id="ev-am">∞</div></div></div>
+      <div class="hud-wep"><span class="hud-wep-name" id="e-wname">—</span><div class="rdot" id="e-wdot"></div></div>
+      <div class="hud-statuses" id="e-stats" style="justify-content:flex-end;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Ability bar (bottom) -->
+<div class="hud-bottom" id="hud-bottom" style="display:none;">
+  <div class="controls-hint" data-i="controls_hint">
+    WASD/ARROWS MOVE | SPACE JUMP | MOUSE AIM/FIRE<br>
+    Q SWAP WEAPON | R RELOAD | X MELEE | 1-4 ABILITIES
+  </div>
+  <div class="ab-row" id="ab-row"></div>
+  <div class="controls-hint" style="text-align:right;">
+    <span data-i="crit_hint">CRITS: 2-3× DAMAGE</span><br>
+    <span data-i="combo_hint">COMBOS: SCORE MULT</span><br>
+    <span data-i="walljump_hint">WALL SLIDE: ↑ TO JUMP</span>
+  </div>
+</div>
+
+<!-- Overlays -->
+<div id="ovl-dmg"></div>
+<div id="ovl-slow"></div>
+<div id="ovl-fog"></div>
+<div id="ovl-invis"></div>
+<div id="kill-feed"></div>
+
+<!-- ═══ SCREEN: GAME OVER / STATS ═══ -->
+<div class="scr" id="scr-over">
+  <div class="grid-bg"></div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;">
+    <div class="result-title" id="ov-title">DEFEATED</div>
+    <div class="result-score" id="ov-score">SCORE: 0</div>
+    <div class="result-wave" id="ov-wave">WAVE: 1</div>
+    <div class="result-xp" id="ov-xp">+0 XP</div>
+    <div class="stats-grid" id="ov-stats"></div>
+    <div class="btn-row">
+      <button class="btn btn-green" onclick="startFlow('vs-ai')">► <span data-i="play_again">PLAY AGAIN</span></button>
+      <button class="btn btn-dim" onclick="showScr('scr-menu')"><span data-i="menu">MENU</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: PROGRESSION ═══ -->
+<div class="scr" id="scr-prog">
+  <div class="grid-bg"></div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;">
+    <div class="title" style="font-size:18px;" data-i="progression">PROGRESSION</div>
+    <div class="prog-section">
+      <div class="prog-label" id="prog-level-label">LEVEL 1 — 0 / 500 XP</div>
+      <div class="bar-wrap" style="height:10px;"><div class="bar-fill barxp" id="prog-xp-bar" style="width:0%"></div></div>
+      <div style="font-family:var(--font-px);font-size:5px;color:var(--dim);margin-top:10px;" data-i="total_stats">LIFETIME STATS</div>
+      <div class="stats-grid" id="prog-stats" style="width:100%;margin:8px 0;"></div>
+      <div style="font-family:var(--font-px);font-size:5px;color:var(--dim);margin-top:6px;" data-i="unlocks">UNLOCKS</div>
+      <div class="unlock-grid" id="prog-unlocks"></div>
+    </div>
+    <button class="btn btn-dim" onclick="showScr('scr-menu')">← <span data-i="back">BACK</span></button>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: CODEX ═══ -->
+<div class="scr" id="scr-codex" style="overflow-y:auto;padding:20px 0;">
+  <div class="grid-bg"></div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:100%;max-width:900px;padding:0 12px;">
+    <div class="title" style="font-size:16px;margin-bottom:8px;" data-i="codex">CODEX</div>
+    <div class="btn-row" style="margin-bottom:10px;" id="codex-tabs">
+      <button class="btn btn-blue btn-sm" onclick="codexTab('weapons')" data-i="weapons">WEAPONS</button>
+      <button class="btn btn-sm btn-dim" onclick="codexTab('abilities')" data-i="abilities">ABILITIES</button>
+    </div>
+    <div id="codex-content" style="width:100%;"></div>
+    <button class="btn btn-dim" style="margin-top:12px;" onclick="showScr('scr-menu')">← <span data-i="back">BACK</span></button>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: SETTINGS ═══ -->
+<div class="scr" id="scr-settings">
+  <div class="grid-bg"></div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;">
+    <div class="title" style="font-size:16px;" data-i="settings">SETTINGS</div>
+    <div class="panel" style="width:360px;">
+      <div class="panel-title" data-i="language">LANGUAGE</div>
+      <div class="btn-row">
+        <button class="btn btn-blue btn-sm" onclick="setLang('en')">English</button>
+        <button class="btn btn-blue btn-sm" onclick="setLang('tr')">Türkçe</button>
+      </div>
+      <div class="panel-title" style="margin-top:12px;" data-i="volume">SFX VOLUME</div>
+      <input type="range" min="0" max="100" value="60" style="width:100%;" id="sfx-vol">
+      <div class="panel-title" style="margin-top:12px;" data-i="screenshake">SCREEN SHAKE</div>
+      <div class="btn-row">
+        <button class="btn btn-green btn-sm" onclick="toggleSetting('shake',true)" data-i="on">ON</button>
+        <button class="btn btn-dim btn-sm" onclick="toggleSetting('shake',false)" data-i="off">OFF</button>
+      </div>
+    </div>
+    <button class="btn btn-dim" onclick="showScr('scr-menu')">← <span data-i="back">BACK</span></button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+//  PIXEL REAPER X  |  Complete Game Engine
+//  Single-file, self-contained browser game
+// ═══════════════════════════════════════════════════════════════════════
+
+'use strict';
+
+// ───────────────────────────────────────────────────────────────────────
+// I18N — Full Turkish & English string tables
+// ───────────────────────────────────────────────────────────────────────
+const I18N = {
+  en:{
+    tagline:'CHAOS ARENA — EVERY RUN DIFFERENT',
+    vsai:'VS AI',vsai_desc:'Fight an adaptive NPC opponent',
+    progress:'PROGRESSION',progress_desc:'XP, levels & cosmetic unlocks',
+    codex:'CODEX',codex_desc:'All 100 weapons & 100 abilities',
+    settings:'SETTINGS',settings_desc:'Controls, display & language',
+    hiscore:'HI-SCORE',player:'▶ PLAYER',enemy:'ENEMY ◀',
+    your_weapons:'YOUR WEAPONS (RNG)',your_abilities:'YOUR ABILITIES (RNG)',
+    map_preview:'MAP PREVIEW',round_mods:'ROUND MODIFIERS',
+    difficulty:'DIFFICULTY',enemy_loadout:'ENEMY LOADOUT',
+    easy:'EASY',normal:'NORMAL',hard:'HARD',extreme:'EXTREME',
+    rolling:'ROLLING YOUR LOADOUT...',reroll:'REROLL',fight:'FIGHT!',back:'BACK',
+    play_again:'PLAY AGAIN',menu:'MENU',progression:'PROGRESSION',
+    total_stats:'LIFETIME STATS',unlocks:'UNLOCKS',
+    weapons:'WEAPONS',abilities:'ABILITIES',language:'LANGUAGE',volume:'VOLUME',
+    screenshake:'SCREEN SHAKE',on:'ON',off:'OFF',codex:'CODEX',
+    controls_hint:'WASD MOVE | SPACE JUMP | MOUSE AIM/FIRE\nQ SWAP | R RELOAD | X MELEE | 1-4 ABILITIES',
+    crit_hint:'CRITS: 2-3× DAMAGE',combo_hint:'COMBOS: SCORE MULT',walljump_hint:'WALL SLIDE: ↑ TO JUMP',
+    stat_kills:'KILLS',stat_shots:'SHOTS FIRED',stat_acc:'ACCURACY',stat_dmg:'DMG DEALT',
+    stat_time:'TIME SURVIVED',stat_combo:'BEST COMBO',stat_wave:'WAVE REACHED',stat_score:'FINAL SCORE',
+    victory:'VICTORY!',defeated:'DEFEATED',wave:'WAVE',score:'SCORE',xp_earned:'XP EARNED',
+    total_kills:'TOTAL KILLS',total_matches:'MATCHES',total_waves:'WAVES CLEARED',
+    new_unlock:'NEW UNLOCK!',rank:'RANK',
+  },
+  tr:{
+    tagline:'KAOS ARENA — HER OYUN FARKLI',
+    vsai:'YAPAY ZEKA',vsai_desc:'Uyarlanabilir NPC rakibe karşı savaş',
+    progress:'İLERLEME',progress_desc:'XP, seviye & kozmetik açılımlar',
+    codex:'KODEKS',codex_desc:'100 silah & 100 yetenek',
+    settings:'AYARLAR',settings_desc:'Kontroller, görüntü & dil',
+    hiscore:'EN YÜKSEK SKOR',player:'▶ OYUNCU',enemy:'DÜŞMAN ◀',
+    your_weapons:'SİLAHLARIN (RNG)',your_abilities:'YETENEKLERİN (RNG)',
+    map_preview:'HARİTA ÖNİZLEME',round_mods:'TUR MODİFİKATÖRLERİ',
+    difficulty:'ZORLUK',enemy_loadout:'DÜŞMANIN YÜKLEMESİ',
+    easy:'KOLAY',normal:'NORMAL',hard:'ZOR',extreme:'AŞIRI',
+    rolling:'YÜKLEMENİ OLUŞTURUYORUM...',reroll:'YENİDEN ÇEV',fight:'SAVAŞ!',back:'GERİ',
+    play_again:'YENİDEN OYNA',menu:'MENÜ',progression:'İLERLEME',
+    total_stats:'TÜM ZAMANLAR',unlocks:'AÇILIMLAR',
+    weapons:'SİLAHLAR',abilities:'YETENEKLERİ',language:'DİL',volume:'SES',
+    screenshake:'EKRAN TİTREMESİ',on:'AÇIK',off:'KAPALI',codex:'KODEKS',
+    controls_hint:'WASD HAREKET | BOŞLUK ZIPLa | FARE NIŞAN/ATEŞ\nQ SİLAH DEĞİŞ | R ŞARJI | X YAKIND | 1-4 YETENEKLERİ',
+    crit_hint:'KRİTİK: 2-3× HASAR',combo_hint:'KOMBO: SKOR ÇARPANI',walljump_hint:'DUVAR KAYMA: ↑ ZIPLa',
+    stat_kills:'ÖLDÜRMELER',stat_shots:'ATILAN MERMİ',stat_acc:'İSABET ORANI',stat_dmg:'VERİLEN HASAR',
+    stat_time:'HAYATTA KALMA SÜRESİ',stat_combo:'EN İYİ KOMBO',stat_wave:'ULAŞILAN DALGA',stat_score:'SON SKOR',
+    victory:'ZAFERİ!',defeated:'YENİLDİN',wave:'DALGA',score:'SKOR',xp_earned:'KAZANILAN XP',
+    total_kills:'TOPLAM ÖLDÜRME',total_matches:'MAÇLAR',total_waves:'TEMİZLENEN DALGALAR',
+    new_unlock:'YENİ AÇILIM!',rank:'RÜTBE',
+  }
+};
+
+let LANG = localStorage.getItem('pxr_lang')||'en';
+function t(k){ return (I18N[LANG]||I18N.en)[k] || (I18N.en)[k] || k; }
+function setLang(l){
+  LANG=l; localStorage.setItem('pxr_lang',l);
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('on',b.dataset.l===l));
+  document.documentElement.lang=l;
+  document.querySelectorAll('[data-i]').forEach(el=>{
+    const k=el.dataset.i; if(I18N[l]&&I18N[l][k]) el.textContent=I18N[l][k];
+  });
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// PROGRESSION — localStorage persistence
+// ───────────────────────────────────────────────────────────────────────
+const PROG_DEFAULTS = {
+  xp:0,level:1,hiScore:0,totalKills:0,totalMatches:0,totalWaves:0,
+  totalShots:0,totalHits:0,totalDmg:0,rerollsUsed:0,
+  unlocked:[],settings:{shake:true,sfxVol:60}
+};
+let PROG = (() => {
+  try { return {...PROG_DEFAULTS,...JSON.parse(localStorage.getItem('pxr_prog')||'{}')}; }
+  catch { return {...PROG_DEFAULTS}; }
+})();
+function saveProg() { try{localStorage.setItem('pxr_prog',JSON.stringify(PROG));}catch{} }
+
+const XP_TABLE = lvl => 400 + lvl*180; // XP needed per level
+
+function addXP(amt){
+  PROG.xp += amt;
+  let changed=false;
+  while(PROG.xp >= XP_TABLE(PROG.level)){
+    PROG.xp -= XP_TABLE(PROG.level);
+    PROG.level++;
+    changed=true;
+  }
+  if(changed) checkUnlocks();
+  saveProg();
+  return changed;
+}
+
+const UNLOCK_DEFS = [
+  {id:'reroll2',name:'EXTRA REROLL',nameTR:'FAZLADAN YENİDEN',req:3,desc:'2 rerolls per lobby'},
+  {id:'leg_boost',name:'LUCKY ROLL +',nameTR:'ŞANS ARTIŞI +',req:5,desc:'+6% legendary chance'},
+  {id:'hp_boost',name:'IRON WILL',nameTR:'DEMİR İRADE',req:8,desc:'Start with 125 HP'},
+  {id:'4abilities',name:'QUAD POWER',nameTR:'DÖRTLÜ GÜÇ',req:12,desc:'Always get 4 abilities'},
+  {id:'crit_boost',name:'EAGLE EYE',nameTR:'KARTAL GÖZÜ',req:15,desc:'+8% crit chance'},
+  {id:'energy_boost',name:'OVERDRIVE',nameTR:'AŞIRI VİTES',req:20,desc:'+20 max energy'},
+  {id:'combo_king',name:'COMBO KING',nameTR:'KOMBO KRALI',req:25,desc:'Combo max raised to 40×'},
+  {id:'mythic_unlock',name:'MYTHIC RIFT',nameTR:'MİTİK RIFT',req:30,desc:'Mythic rarity unlocked'},
+  {id:'triple_wep',name:'TRIPLE ARSENAL',nameTR:'ÜÇ SİLAH',req:35,desc:'Always get 3 weapons'},
+  {id:'adapt_perk',name:'SURVIVAL INSTINCT',nameTR:'HAYATTA KALMA',req:40,desc:'Gain HP on combo ×10+'},
+  {id:'skin_neon',name:'NEON SKIN',nameTR:'NEON GÖRÜNÜM',req:10,desc:'Cosmetic: Neon player'},
+  {id:'skin_ghost',name:'GHOST SKIN',nameTR:'HAYALET GÖR.',req:18,desc:'Cosmetic: Ghost player'},
+  {id:'skin_fire',name:'FIRE SKIN',nameTR:'ATEŞ GÖR.',req:28,desc:'Cosmetic: Fire player'},
+  {id:'skin_void',name:'VOID SKIN',nameTR:'BOŞ GÖR.',req:45,desc:'Cosmetic: Void player'},
+];
+function checkUnlocks(){
+  UNLOCK_DEFS.forEach(u=>{
+    if(PROG.level>=u.req && !PROG.unlocked.includes(u.id)){
+      PROG.unlocked.push(u.id);
+      kf(`⭐ ${LANG==='tr'?u.nameTR:u.name} ${t('new_unlock')}!`,'legendary');
+    }
+  });
+}
+function hasUnlock(id){ return PROG.unlocked.includes(id); }
+
+// ───────────────────────────────────────────────────────────────────────
+// WEAPONS — 100 weapons across 8 categories
+// ───────────────────────────────────────────────────────────────────────
+const RARITY_WEIGHTS = {common:46,uncommon:26,rare:14,epic:8,legendary:4,mythic:2};
+const RARITY_ORDER = ['common','uncommon','rare','epic','legendary','mythic'];
+const RARITY_COLOR = {common:'#888090',uncommon:'#28e868',rare:'#2970ff',epic:'#a030ff',legendary:'#ffcc28',mythic:'#ff2a4a'};
+const RARITY_DOT = {common:'rdc',uncommon:'rdu',rare:'rdr',epic:'rde',legendary:'rdl',mythic:'rdm'};
+const RARITY_CLS = {common:'rc',uncommon:'ru',rare:'rr',epic:'re',legendary:'rl',mythic:'rm'};
+
+// Weapon template fields:
+// cat,name,nameTR,icon,dmg[min,max],rate(ms),speed,spread,ammoMax,reload(ms),
+// rarity,color,auto,pellets,crit,effect,pierce,bouncy,explosive,explodeR,
+// burst,burstDelay,spinup,gravity,short,blackhole,laser,fan,desc,descTR
+const WEAPONS = [
+// ── PISTOLS (12) ──────────────────────────────────────────────
+{id:'p1',cat:'pistol',name:'M9 PISTOL',nameTR:'M9 TABANCA',icon:'🔫',dmg:[20,30],rate:380,speed:14,spread:.06,ammoMax:12,reload:900,rarity:'common',color:'#ffee88',desc:'Reliable sidearm. Good all-rounder.',descTR:'Güvenilir tabanca.'},
+{id:'p2',cat:'pistol',name:'MAGNUM .44',nameTR:'.44 MAGNUM',icon:'🔫',dmg:[48,68],rate:720,speed:15,spread:.04,ammoMax:6,reload:1400,rarity:'uncommon',color:'#ff9966',crit:.12,desc:'High damage, slow RoF.',descTR:'Yüksek hasar, yavaş atış.'},
+{id:'p3',cat:'pistol',name:'DUAL PISTOLS',nameTR:'ÇİFT TABANCA',icon:'🔫',dmg:[16,24],rate:190,speed:14,spread:.09,ammoMax:24,reload:1100,rarity:'rare',color:'#ffdd44',fan:2,desc:'Fires 2 bullets simultaneously.',descTR:'Aynı anda 2 mermi atar.'},
+{id:'p4',cat:'pistol',name:'HAND CANNON',nameTR:'EL TOPU',icon:'💥',dmg:[82,118],rate:1000,speed:16,spread:.05,ammoMax:4,reload:1800,rarity:'epic',color:'#ff6600',crit:.45,desc:'50% crit chance. Devastating.',descTR:'Yüksek kritik şansı.'},
+{id:'p5',cat:'pistol',name:'VOID GUN',nameTR:'BOŞ TABANCA',icon:'🌀',dmg:[38,58],rate:420,speed:13,spread:.05,ammoMax:8,reload:1200,rarity:'legendary',color:'#8040ff',pierce:true,effect:'freeze',desc:'Pierces all targets. Freezes on hit.',descTR:'Tüm hedefleri deler. Dondurur.'},
+{id:'p6',cat:'pistol',name:'BOLT PISTOL',nameTR:'CIVA TABANCA',icon:'⚡',dmg:[28,44],rate:260,speed:18,spread:.04,ammoMax:10,reload:1000,rarity:'uncommon',color:'#44ffff',desc:'Lightning-fast bullets.',descTR:'Hızlı mermi.'},
+{id:'p7',cat:'pistol',name:'PLASMA PISTOL',nameTR:'PLAZMA TABANCA',icon:'🔵',dmg:[35,55],rate:500,speed:12,spread:.06,ammoMax:9,reload:1300,rarity:'rare',color:'#44aaff',effect:'burn',desc:'Plasma rounds burn on impact.',descTR:'Plazma mermileri yakar.'},
+{id:'p8',cat:'pistol',name:'GHOST PISTOL',nameTR:'HAYALET TABANCA',icon:'👻',dmg:[25,40],rate:350,speed:14,spread:.05,ammoMax:14,reload:1000,rarity:'rare',color:'#aaffaa',pierce:true,desc:'Bullets pass through walls.',descTR:'Mermi duvarlardan geçer.'},
+{id:'p9',cat:'pistol',name:'MIRROR GUN',nameTR:'AYNA TABANCA',icon:'🪞',dmg:[22,35],rate:400,speed:13,spread:.04,ammoMax:10,reload:1100,rarity:'epic',color:'#ffffff',bouncy:4,desc:'Bullets ricochet 4 times.',descTR:'Mermi 4 kez sektirilir.'},
+{id:'p10',cat:'pistol',name:'VENOM DART',nameTR:'ZEHIR OK',icon:'🎯',dmg:[18,28],rate:340,speed:11,spread:.04,ammoMax:12,reload:1000,rarity:'uncommon',color:'#40ff40',effect:'poison',desc:'Poisonous darts.',descTR:'Zehirli oklar.'},
+{id:'p11',cat:'pistol',name:'OVERCLOCKED',nameTR:'AŞIRI GÜÇ',icon:'⚡',dmg:[55,85],rate:600,speed:16,spread:.03,ammoMax:5,reload:1600,rarity:'epic',color:'#ffff22',crit:.3,desc:'Supercharged shots.',descTR:'Aşırı güçlendirilmiş.'},
+{id:'p12',cat:'pistol',name:'NULL CANNON',nameTR:'BOŞ TOP',icon:'🌑',dmg:[70,110],rate:900,speed:14,spread:.04,ammoMax:3,reload:2000,rarity:'mythic',color:'#cc00ff',effect:'stun',blackhole:true,desc:'Fires micro black holes.',descTR:'Mikro kara delik atar.'},
+
+// ── SMGs (12) ─────────────────────────────────────────────────
+{id:'s1',cat:'smg',name:'MP5',nameTR:'MP5',icon:'🔫',dmg:[10,16],rate:75,speed:15,spread:.11,ammoMax:40,reload:1400,rarity:'common',color:'#ffaa22',auto:true,desc:'Reliable submachine gun.',descTR:'Güvenilir hafif makineli.'},
+{id:'s2',cat:'smg',name:'UZI',nameTR:'UZİ',icon:'🔫',dmg:[8,14],rate:55,speed:16,spread:.14,ammoMax:50,reload:1300,rarity:'common',color:'#ffcc44',auto:true,desc:'Insane rate of fire.',descTR:'Inanılmaz ateş hızı.'},
+{id:'s3',cat:'smg',name:'SCORPION',nameTR:'AKREP',icon:'🦂',dmg:[14,22],rate:90,speed:15,spread:.10,ammoMax:36,reload:1500,rarity:'uncommon',color:'#ff8844',auto:true,crit:.08,desc:'Scorpion submachine gun.',descTR:'Akrep hafif makineli.'},
+{id:'s4',cat:'smg',name:'P90',nameTR:'P90',icon:'🔫',dmg:[12,18],rate:65,speed:14,spread:.12,ammoMax:48,reload:1400,rarity:'uncommon',color:'#88ffcc',auto:true,desc:'High capacity SMG.',descTR:'Yüksek kapasiteli.'},
+{id:'s5',cat:'smg',name:'KRISS VECTOR',nameTR:'KRISS VEKTÖR',icon:'🔫',dmg:[16,26],rate:50,speed:16,spread:.09,ammoMax:35,reload:1500,rarity:'rare',color:'#44aaff',auto:true,desc:'Ultra-low recoil.',descTR:'Ultra düşük geri tepme.'},
+{id:'s6',cat:'smg',name:'MAC-10',nameTR:'MAC-10',icon:'💨',dmg:[9,15],rate:45,speed:15,spread:.16,ammoMax:55,reload:1200,rarity:'uncommon',color:'#ffcc00',auto:true,desc:'Spray and pray.',descTR:'Taramak ve dua etmek.'},
+{id:'s7',cat:'smg',name:'BIZON',nameTR:'BİZON',icon:'🔫',dmg:[11,17],rate:70,speed:14,spread:.11,ammoMax:64,reload:1600,rarity:'rare',color:'#aaffff',auto:true,desc:'Drum magazine. Never reload.',descTR:'Tamburlu şarjör.'},
+{id:'s8',cat:'smg',name:'PLASMA SMG',nameTR:'PLAZMA HMM',icon:'⚡',dmg:[15,24],rate:80,speed:14,spread:.12,ammoMax:38,reload:1500,rarity:'rare',color:'#ff44ff',auto:true,effect:'burn',desc:'Plasma rounds, burn DoT.',descTR:'Plazma mermisi, yakar.'},
+{id:'s9',cat:'smg',name:'CRYO SMG',nameTR:'KRİYO HMM',icon:'❄️',dmg:[13,20],rate:85,speed:13,spread:.10,ammoMax:36,reload:1500,rarity:'epic',color:'#88ccff',auto:true,effect:'freeze',desc:'Slows enemies over time.',descTR:'Zamanla yavaşlatır.'},
+{id:'s10',cat:'smg',name:'ACID GUN',nameTR:'ASİT SİLAHI',icon:'☠️',dmg:[12,18],rate:78,speed:14,spread:.11,ammoMax:34,reload:1400,rarity:'epic',color:'#44ff44',auto:true,effect:'poison',desc:'Acid spray melts armor.',descTR:'Asit spreyi zırhı eritir.'},
+{id:'s11',cat:'smg',name:'STORM BREAKER',nameTR:'FIRTINA KIRAN',icon:'🌪️',dmg:[20,32],rate:60,speed:15,spread:.09,ammoMax:30,reload:1600,rarity:'legendary',color:'#ffff44',auto:true,crit:.15,desc:'Electric rounds stun.',descTR:'Elektrikli mermi sersemletir.'},
+{id:'s12',cat:'smg',name:'NULL STREAM',nameTR:'BOŞ AKIŞI',icon:'🌌',dmg:[18,30],rate:50,speed:16,spread:.08,ammoMax:40,reload:1500,rarity:'mythic',color:'#ff00aa',auto:true,pierce:true,effect:'stun',desc:'Voids pierce all reality.',descTR:'Tüm gerçekliği deler.'},
+
+// ── ASSAULT RIFLES (14) ───────────────────────────────────────
+{id:'ar1',cat:'rifle',name:'AK-47',nameTR:'AK-47',icon:'🔫',dmg:[18,26],rate:120,speed:16,spread:.07,ammoMax:30,reload:1900,rarity:'common',color:'#ffcc44',auto:true,desc:'Classic assault rifle.',descTR:'Klasik saldırı tüfeği.'},
+{id:'ar2',cat:'rifle',name:'M4A1',nameTR:'M4A1',icon:'🔫',dmg:[16,24],rate:100,speed:17,spread:.06,ammoMax:30,reload:1800,rarity:'common',color:'#88ccff',auto:true,desc:'Accurate, controllable.',descTR:'İsabetli, kontrol edilebilir.'},
+{id:'ar3',cat:'rifle',name:'SCAR-H',nameTR:'SCAR-H',icon:'🔫',dmg:[22,34],rate:140,speed:16,spread:.07,ammoMax:28,reload:2000,rarity:'uncommon',color:'#ffaa44',auto:true,crit:.09,desc:'Heavy assault rifle.',descTR:'Ağır saldırı tüfeği.'},
+{id:'ar4',cat:'rifle',name:'FAMAS',nameTR:'FAMAS',icon:'🔫',dmg:[19,28],rate:75,speed:17,spread:.07,ammoMax:30,reload:1800,rarity:'uncommon',color:'#aaffaa',burst:3,burstDelay:70,desc:'3-round burst fire.',descTR:'3 mermi burst ateşi.'},
+{id:'ar5',cat:'rifle',name:'G36',nameTR:'G36',icon:'🔫',dmg:[20,30],rate:110,speed:16,spread:.06,ammoMax:32,reload:1850,rarity:'uncommon',color:'#44aaff',auto:true,desc:'Balanced assault rifle.',descTR:'Dengeli saldırı tüfeği.'},
+{id:'ar6',cat:'rifle',name:'QBZ-95',nameTR:'QBZ-95',icon:'🔫',dmg:[17,25],rate:95,speed:17,spread:.06,ammoMax:30,reload:1750,rarity:'uncommon',color:'#ff8888',auto:true,desc:'Chinese bullpup design.',descTR:'Çin bullpup tasarımı.'},
+{id:'ar7',cat:'rifle',name:'AUG',nameTR:'AUG',icon:'🔫',dmg:[21,31],rate:115,speed:16,spread:.055,ammoMax:30,reload:1850,rarity:'rare',color:'#ccaaff',auto:true,crit:.1,desc:'Scoped bullpup rifle.',descTR:'Dürbünlü bullpup tüfek.'},
+{id:'ar8',cat:'rifle',name:'PLASMA RIFLE',nameTR:'PLAZMA TÜFEĞİ',icon:'💙',dmg:[22,36],rate:130,speed:14,spread:.07,ammoMax:28,reload:2000,rarity:'rare',color:'#4488ff',auto:true,effect:'burn',desc:'Plasma rounds burn armor.',descTR:'Plazma zırhı yakar.'},
+{id:'ar9',cat:'rifle',name:'CHAIN GUN AR',nameTR:'ZİNCİR TABANCA',icon:'🔩',dmg:[14,20],rate:55,speed:15,spread:.09,ammoMax:60,reload:2500,rarity:'rare',color:'#ffdd00',auto:true,spinup:600,desc:'Minigun-style spinup.',descTR:'Minigun tarzı ısınma.'},
+{id:'ar10',cat:'rifle',name:'STORM RIFLE',nameTR:'FIRTINA TÜFEĞİ',icon:'⚡',dmg:[24,38],rate:110,speed:16,spread:.066,ammoMax:28,reload:2000,rarity:'epic',color:'#ffff44',auto:true,effect:'stun',crit:.12,desc:'Electric storm rounds.',descTR:'Elektrikli fırtına mermisi.'},
+{id:'ar11',cat:'rifle',name:'ACID SPRAYER',nameTR:'ASİT FISKİYE',icon:'🟢',dmg:[16,25],rate:90,speed:12,spread:.12,ammoMax:40,reload:2000,rarity:'epic',color:'#44ff44',auto:true,effect:'poison',short:true,desc:'Short range acid spray.',descTR:'Kısa mesafe asit spreyi.'},
+{id:'ar12',cat:'rifle',name:'CRYO RIFLE',nameTR:'KRİYO TÜFEĞİ',icon:'❄️',dmg:[20,30],rate:120,speed:13,spread:.07,ammoMax:30,reload:1900,rarity:'epic',color:'#88ddff',auto:true,effect:'freeze',desc:'Cryogenic assault rifle.',descTR:'Kriyojenik saldırı tüfeği.'},
+{id:'ar13',cat:'rifle',name:'RAILGUN AR',nameTR:'REY TABANCASI',icon:'📡',dmg:[45,70],rate:400,speed:28,spread:.01,ammoMax:12,reload:2500,rarity:'legendary',color:'#22ffff',pierce:true,crit:.2,desc:'Electromagnetic rail slugs.',descTR:'Elektromanyetik rayl mermisi.'},
+{id:'ar14',cat:'rifle',name:'SINGULARITY AR',nameTR:'TEKİLLİK TÜFEĞİ',icon:'🌌',dmg:[30,50],rate:110,speed:15,spread:.06,ammoMax:25,reload:2200,rarity:'mythic',color:'#ff00ff',auto:true,pierce:true,effect:'stun',blackhole:true,desc:'Fires miniature singularities.',descTR:'Minyatür tekillikler atar.'},
+
+// ── SHOTGUNS (12) ─────────────────────────────────────────────
+{id:'sh1',cat:'shotgun',name:'PUMP SHOTGUN',nameTR:'POMPALITÜFEK',icon:'🔫',dmg:[16,24],rate:700,speed:10,spread:.30,ammoMax:8,reload:2100,rarity:'common',color:'#ff8844',pellets:8,desc:'Classic pump-action.',descTR:'Klasik pompalı tüfek.'},
+{id:'sh2',cat:'shotgun',name:'DOUBLE BARREL',nameTR:'ÇİFT NAMLULU',icon:'🔫',dmg:[22,34],rate:300,speed:11,spread:.28,ammoMax:2,reload:1400,rarity:'common',color:'#ffcc88',pellets:10,burst:2,burstDelay:80,desc:'2 barrels, huge burst.',descTR:'2 namlu, büyük patlama.'},
+{id:'sh3',cat:'shotgun',name:'TACTICAL SG',nameTR:'TAKTİK POMPA',icon:'🔫',dmg:[18,28],rate:500,speed:12,spread:.24,ammoMax:10,reload:1900,rarity:'uncommon',color:'#88aaff',pellets:7,crit:.08,desc:'Tactical shotgun. Semi-auto.',descTR:'Taktik pompalı. Yarı otomatik.'},
+{id:'sh4',cat:'shotgun',name:'AUTO SHOTGUN',nameTR:'OTOMATİK POMPA',icon:'🔫',dmg:[12,20],rate:380,speed:10,spread:.28,ammoMax:12,reload:2200,rarity:'uncommon',color:'#ffaa44',pellets:6,auto:true,desc:'Semi-auto shell spam.',descTR:'Yarı otomatik atış.'},
+{id:'sh5',cat:'shotgun',name:'SLUG CANNON',nameTR:'MERMİ TOPU',icon:'💣',dmg:[60,90],rate:800,speed:14,spread:.04,ammoMax:6,reload:2000,rarity:'rare',color:'#ff6600',crit:.18,desc:'Single slug. Sniper-like.',descTR:'Tek mermi. Keskin nişancı gibi.'},
+{id:'sh6',cat:'shotgun',name:'PLASMA BLAST',nameTR:'PLAZMA PATLAMASI',icon:'💥',dmg:[14,22],rate:600,speed:10,spread:.32,ammoMax:8,reload:2000,rarity:'rare',color:'#ff44ff',pellets:9,effect:'burn',desc:'Plasma pellets ignite.',descTR:'Plazma saçması yakar.'},
+{id:'sh7',cat:'shotgun',name:'FROST CANNON',nameTR:'BUZ TOPU',icon:'❄️',dmg:[18,28],rate:680,speed:9,spread:.28,ammoMax:7,reload:2100,rarity:'rare',color:'#88ddff',pellets:8,effect:'freeze',desc:'Freezing spray.',descTR:'Dondurucu sprey.'},
+{id:'sh8',cat:'shotgun',name:'TOXIC BLAST',nameTR:'ZEHİRLİ PATLAMA',icon:'☠️',dmg:[13,20],rate:620,speed:9,spread:.30,ammoMax:10,reload:2000,rarity:'epic',color:'#44ff44',pellets:8,effect:'poison',desc:'Acid pellet cloud.',descTR:'Asit saçma bulutu.'},
+{id:'sh9',cat:'shotgun',name:'BOUNCER SG',nameTR:'SEKTİRİCİ POMPA',icon:'🔵',dmg:[20,30],rate:650,speed:11,spread:.22,ammoMax:8,reload:2100,rarity:'epic',color:'#44aaff',pellets:6,bouncy:2,desc:'Pellets bounce off walls.',descTR:'Saçmalar duvardan sektirilir.'},
+{id:'sh10',cat:'shotgun',name:'GRAVITY SHELL',nameTR:'YERÇEKİMİ KABI',icon:'🌍',dmg:[20,32],rate:700,speed:8,spread:.26,ammoMax:6,reload:2200,rarity:'epic',color:'#88ff88',pellets:7,gravity:.3,desc:'Curved shells.',descTR:'Eğri saçmalar.'},
+{id:'sh11',cat:'shotgun',name:'DRAGON BREATH',nameTR:'EJDER NEFES',icon:'🐉',dmg:[25,40],rate:500,speed:9,spread:.34,ammoMax:8,reload:2000,rarity:'legendary',color:'#ff4400',pellets:10,effect:'burn',short:true,desc:'Fire breath shotgun.',descTR:'Ateş nefes pompalı.'},
+{id:'sh12',cat:'shotgun',name:'VOID BURST',nameTR:'BOŞ PATLAMA',icon:'🌌',dmg:[30,50],rate:600,speed:10,spread:.28,ammoMax:6,reload:2200,rarity:'mythic',color:'#aa00ff',pellets:8,pierce:true,effect:'stun',desc:'Void pellets pierce all.',descTR:'Boşluk saçmaları hepsini deler.'},
+
+// ── SNIPERS (12) ──────────────────────────────────────────────
+{id:'sn1',cat:'sniper',name:'BOLT ACTION',nameTR:'SÜRGÜLÜ TÜFEK',icon:'🎯',dmg:[88,125],rate:1500,speed:26,spread:.01,ammoMax:5,reload:2600,rarity:'common',color:'#44ffcc',crit:.25,desc:'Classic bolt-action.',descTR:'Klasik sürgülü tüfek.'},
+{id:'sn2',cat:'sniper',name:'DMR',nameTR:'DMR',icon:'🎯',dmg:[58,85],rate:700,speed:22,spread:.02,ammoMax:10,reload:2200,rarity:'common',color:'#aaddff',crit:.15,desc:'Designated marksman rifle.',descTR:'Atışçı tüfeği.'},
+{id:'sn3',cat:'sniper',name:'ANTI-MATERIAL',nameTR:'ZIRH DELİCİ',icon:'🎯',dmg:[140,200],rate:2200,speed:30,spread:.008,ammoMax:3,reload:3000,rarity:'rare',color:'#ffaacc',crit:.3,pierce:true,desc:'Pierces armor and players.',descTR:'Zırh ve oyuncuları deler.'},
+{id:'sn4',cat:'sniper',name:'SEMI-AUTO SR',nameTR:'YARIM OTOMATİK',icon:'🎯',dmg:[70,100],rate:900,speed:24,spread:.015,ammoMax:8,reload:2400,rarity:'uncommon',color:'#ccffaa',crit:.2,desc:'Semi-auto sniper.',descTR:'Yarı otomatik keskin nişancı.'},
+{id:'sn5',cat:'sniper',name:'PLASMA SNIPER',nameTR:'PLAZMA TÜFEĞİ',icon:'💙',dmg:[95,140],rate:1600,speed:25,spread:.012,ammoMax:5,reload:2800,rarity:'epic',color:'#4466ff',crit:.22,effect:'burn',desc:'Plasma rail shot.',descTR:'Plazma rel atışı.'},
+{id:'sn6',cat:'sniper',name:'CRYO SNIPER',nameTR:'KRİYO NİŞANCI',icon:'❄️',dmg:[80,115],rate:1500,speed:24,spread:.013,ammoMax:6,reload:2600,rarity:'epic',color:'#88ddff',crit:.2,effect:'freeze',desc:'Frozen pinpoint shot.',descTR:'Dondurucu hassas atış.'},
+{id:'sn7',cat:'sniper',name:'RAILGUN',nameTR:'RAY SİLAHI',icon:'⚡',dmg:[180,260],rate:3000,speed:32,spread:.002,ammoMax:1,reload:3800,rarity:'legendary',color:'#22ffff',pierce:true,crit:.35,desc:'Instant kill potential.',descTR:'Anlık öldürme potansiyeli.'},
+{id:'sn8',cat:'sniper',name:'GHOST RIFLE',nameTR:'HAYALET TÜFEĞİ',icon:'👻',dmg:[100,150],rate:1700,speed:26,spread:.01,ammoMax:4,reload:2800,rarity:'legendary',color:'#ccffcc',pierce:true,crit:.28,desc:'Bullets pass through walls.',descTR:'Mermi duvarlardan geçer.'},
+{id:'sn9',cat:'sniper',name:'EXPLOSIVE SNIPER',nameTR:'PATLAYICI NİŞANCI',icon:'💥',dmg:[70,100],rate:1800,speed:24,spread:.015,ammoMax:4,reload:2800,rarity:'epic',color:'#ff8800',crit:.2,explosive:true,explodeR:70,desc:'Exploding sniper rounds.',descTR:'Patlayan nişancı mermisi.'},
+{id:'sn10',cat:'sniper',name:'BOUNCING SHOT',nameTR:'SEKTİRME ATIŞ',icon:'🔵',dmg:[75,110],rate:1400,speed:22,spread:.012,ammoMax:6,reload:2500,rarity:'epic',color:'#4499ff',crit:.18,bouncy:3,desc:'Bullet bounces 3 times.',descTR:'Mermi 3 kez sektirilir.'},
+{id:'sn11',cat:'sniper',name:'NEUROTOXIN',nameTR:'NÖROTOKSİN',icon:'☠️',dmg:[65,95],rate:1300,speed:22,spread:.014,ammoMax:6,reload:2400,rarity:'legendary',color:'#44ff44',crit:.15,effect:'poison',desc:'Neurotoxin rounds. Lethal DoT.',descTR:'Nörotoksin mermisi. Ölümcül.'},
+{id:'sn12',cat:'sniper',name:'SINGULARITY',nameTR:'TEKİLLİK',icon:'🌑',dmg:[250,400],rate:4000,speed:28,spread:.005,ammoMax:1,reload:5000,rarity:'mythic',color:'#ff00ff',pierce:true,crit:.5,blackhole:true,desc:'The ultimate weapon.',descTR:'Nihai silah.'},
+
+// ── HEAVY (12) ────────────────────────────────────────────────
+{id:'h1',cat:'heavy',name:'ROCKET LAUNCHER',nameTR:'ROKET FIRLATICI',icon:'🚀',dmg:[100,145],rate:1900,speed:7,spread:.02,ammoMax:3,reload:3200,rarity:'rare',color:'#ff4422',explosive:true,explodeR:95,desc:'AOE explosion.',descTR:'AOE patlaması.'},
+{id:'h2',cat:'heavy',name:'GRENADE LAUNCHER',nameTR:'EL BOMBASI FIRLATICI',icon:'💣',dmg:[80,115],rate:1100,speed:9,spread:.05,ammoMax:6,reload:2800,rarity:'rare',color:'#88ff44',explosive:true,explodeR:80,gravity:.25,bounce:true,desc:'Bouncing grenades.',descTR:'Seken el bombaları.'},
+{id:'h3',cat:'heavy',name:'MINIGUN',nameTR:'MİNİGAN',icon:'💥',dmg:[9,15],rate:55,speed:14,spread:.19,ammoMax:80,reload:4200,rarity:'epic',color:'#ffdd00',auto:true,spinup:900,desc:'Spinup delay, incredible RoF.',descTR:'Isınma gecikmesi, inanılmaz ateş hızı.'},
+{id:'h4',cat:'heavy',name:'FLAMETHROWER',nameTR:'ALEV PÜSKÜRTÜCÜ',icon:'🔥',dmg:[7,13],rate:45,speed:6,spread:.40,ammoMax:60,reload:3200,rarity:'epic',color:'#ff6600',auto:true,effect:'burn',short:true,desc:'Short range. Constant burn.',descTR:'Kısa mesafe. Sürekli yanar.'},
+{id:'h5',cat:'heavy',name:'RPG-7',nameTR:'RPG-7',icon:'🚀',dmg:[130,180],rate:2200,speed:8,spread:.025,ammoMax:2,reload:3500,rarity:'epic',color:'#ff5500',explosive:true,explodeR:110,desc:'Massive blast radius.',descTR:'Büyük patlama yarıçapı.'},
+{id:'h6',cat:'heavy',name:'MORTAR',nameTR:'HAVAN',icon:'💣',dmg:[90,130],rate:1600,speed:8,spread:.03,ammoMax:4,reload:3000,rarity:'rare',color:'#aaaaaa',explosive:true,explodeR:90,gravity:.4,desc:'High arc trajectory.',descTR:'Yüksek yay yörüngesi.'},
+{id:'h7',cat:'heavy',name:'PLASMA CANNON',nameTR:'PLAZMA TOPU',icon:'🔵',dmg:[110,160],rate:2000,speed:8,spread:.03,ammoMax:3,reload:3400,rarity:'legendary',color:'#4444ff',explosive:true,explodeR:85,effect:'burn',desc:'Plasma explosion. Massive burn.',descTR:'Plazma patlaması. Büyük yanma.'},
+{id:'h8',cat:'heavy',name:'BLACK HOLE GUN',nameTR:'KARA DELİK SİLAHI',icon:'🌑',dmg:[40,70],rate:2800,speed:5,spread:.01,ammoMax:2,reload:4000,rarity:'legendary',color:'#6600cc',blackhole:true,desc:'Fires singularities that pull.',descTR:'Çeken tekillikler atar.'},
+{id:'h9',cat:'heavy',name:'STASIS CANNON',nameTR:'DURMA TOPU',icon:'🧊',dmg:[60,90],rate:2000,speed:7,spread:.04,ammoMax:3,reload:3200,rarity:'legendary',color:'#88ccff',explosive:true,explodeR:75,effect:'freeze',desc:'Cryo-explosion. Massive freeze.',descTR:'Kriyо patlaması. Büyük dondurma.'},
+{id:'h10',cat:'heavy',name:'ACID SPRAYER',nameTR:'ASİT MAKINALI',icon:'☠️',dmg:[8,14],rate:50,speed:6,spread:.38,ammoMax:50,reload:3000,rarity:'epic',color:'#44ff00',auto:true,effect:'poison',short:true,desc:'Area denial acid spray.',descTR:'Bölge reddi asit spreyi.'},
+{id:'h11',cat:'heavy',name:'THUNDERSTRIKE',nameTR:'ŞIMŞEK ÇARPMASI',icon:'⚡',dmg:[150,220],rate:2500,speed:20,spread:.01,ammoMax:2,reload:4000,rarity:'mythic',color:'#ffff00',explosive:true,explodeR:100,effect:'stun',pierce:true,desc:'Lightning cannon. Stuns all.',descTR:'Şimşek topu. Hepsini sersemletir.'},
+{id:'h12',cat:'heavy',name:'ANNIHILATOR',nameTR:'YOKEDICI',icon:'💀',dmg:[200,300],rate:3500,speed:6,spread:.02,ammoMax:1,reload:5500,rarity:'mythic',color:'#ff0000',explosive:true,explodeR:140,pierce:true,desc:'Absolute destruction.',descTR:'Mutlak yıkım.'},
+
+// ── EXPERIMENTAL (14) ─────────────────────────────────────────
+{id:'e1',cat:'experimental',name:'BOUNCER',nameTR:'SEKTİRİCİ',icon:'🔵',dmg:[30,45],rate:420,speed:12,spread:.02,ammoMax:10,reload:1600,rarity:'rare',color:'#44aaff',bouncy:4,desc:'Bullets bounce 4 times.',descTR:'Mermi 4 kez sektirilir.'},
+{id:'e2',cat:'experimental',name:'TIME PISTOL',nameTR:'ZAMAN TABANCASI',icon:'⌛',dmg:[35,55],rate:500,speed:10,spread:.04,ammoMax:8,reload:1700,rarity:'epic',color:'#cc88ff',effect:'slow',desc:'Time-dilated bullets.',descTR:'Zaman genişlemeli mermi.'},
+{id:'e3',cat:'experimental',name:'CLONE GUN',nameTR:'KLON TABANCASI',icon:'👥',dmg:[22,36],rate:380,speed:13,spread:.09,ammoMax:12,reload:1800,rarity:'legendary',color:'#ff88ff',fan:3,desc:'Fires 3-bullet fan.',descTR:'3 mermilik yelpazeyi atar.'},
+{id:'e4',cat:'experimental',name:'GRAVITY GUN',nameTR:'YERÇEKİMİ TABANCASI',icon:'🌍',dmg:[25,40],rate:550,speed:6,spread:.02,ammoMax:8,reload:2100,rarity:'epic',color:'#44ff88',gravity:.5,desc:'Bullets curve down.',descTR:'Mermi aşağı eğilir.'},
+{id:'e5',cat:'experimental',name:'ANTI-GRAV',nameTR:'ANTİ-GRAVITE',icon:'🚀',dmg:[25,40],rate:550,speed:7,spread:.02,ammoMax:8,reload:2100,rarity:'epic',color:'#88ff44',gravity:-.3,desc:'Bullets arc upward.',descTR:'Mermi yukarı eğilir.'},
+{id:'e6',cat:'experimental',name:'TELEPORT GUN',nameTR:'IŞINLANMA TABANCASI',icon:'🌀',dmg:[60,90],rate:1200,speed:12,spread:.03,ammoMax:6,reload:2400,rarity:'legendary',color:'#ff44ff',desc:'Bullet teleports target.',descTR:'Mermi hedefi ışınlar.'},
+{id:'e7',cat:'experimental',name:'LASER RIFLE',nameTR:'LAZER TÜFEĞİ',icon:'🔴',dmg:[50,80],rate:220,speed:28,spread:.00,ammoMax:22,reload:2200,rarity:'rare',color:'#ff4444',laser:true,desc:'Instant hitscan laser.',descTR:'Anlık lazer atışı.'},
+{id:'e8',cat:'experimental',name:'PHOTON CANNON',nameTR:'FOTON TOPU',icon:'✨',dmg:[80,120],rate:700,speed:28,spread:.005,ammoMax:6,reload:2600,rarity:'legendary',color:'#ffffff',laser:true,crit:.25,desc:'Pure light. No travel time.',descTR:'Saf ışık. Seyahat süresi yok.'},
+{id:'e9',cat:'experimental',name:'WORMHOLE GUN',nameTR:'SOLUCAN DELİĞİ',icon:'🌌',dmg:[55,85],rate:900,speed:13,spread:.03,ammoMax:5,reload:2500,rarity:'legendary',color:'#8800ff',bouncy:6,pierce:true,desc:'Bounces through portals.',descTR:'Portallardan sekerek geçer.'},
+{id:'e10',cat:'experimental',name:'GRAVITY WELL',nameTR:'YERÇEKİMİ KUYUSU',icon:'🔮',dmg:[30,50],rate:2000,speed:4,spread:.01,ammoMax:3,reload:3500,rarity:'legendary',color:'#8844ff',blackhole:true,explosive:true,explodeR:90,desc:'Singularity explosion.',descTR:'Tekillik patlaması.'},
+{id:'e11',cat:'experimental',name:'TIME CANNON',nameTR:'ZAMAN TOPU',icon:'⏰',dmg:[100,150],rate:2500,speed:10,spread:.02,ammoMax:2,reload:4000,rarity:'mythic',color:'#aaffff',explosive:true,explodeR:100,effect:'slow',desc:'Time bubble explosion.',descTR:'Zaman balonu patlaması.'},
+{id:'e12',cat:'experimental',name:'OMEGA BEAM',nameTR:'OMEGA IŞINI',icon:'Ω',dmg:[300,500],rate:5000,speed:30,spread:.00,ammoMax:1,reload:8000,rarity:'mythic',color:'#ffffff',laser:true,pierce:true,crit:.6,desc:'The Omega Beam. Nothing survives.',descTR:'Omega Işını. Hiçbir şey hayatta kalamaz.'},
+{id:'e13',cat:'experimental',name:'PRISM CANNON',nameTR:'PRİZMA TOPU',icon:'🔷',dmg:[28,45],rate:500,speed:12,spread:.04,ammoMax:9,reload:1900,rarity:'epic',color:'#44ccff',fan:5,bouncy:2,desc:'5-fan with wall bounces.',descTR:'Duvar sekerek 5 yelpazeyi.'},
+{id:'e14',cat:'experimental',name:'REALITY GUN',nameTR:'GERÇEKLİK TABANCASI',icon:'🎆',dmg:[60,100],rate:1000,speed:11,spread:.03,ammoMax:5,reload:3000,rarity:'mythic',color:'#ff88ff',pierce:true,bouncy:3,effect:'stun',explosive:true,explodeR:60,desc:'Bends reality itself.',descTR:'Gerçekliği büker.'},
+
+// ── MELEE (12) ────────────────────────────────────────────────
+{id:'m1',cat:'melee',name:'FISTS',nameTR:'YUMRUKLAR',icon:'👊',dmg:[8,14],rate:300,range:36,ammoMax:Infinity,reload:0,rarity:'common',color:'#ffaa88',desc:'No ammo. Always available.',descTR:'Mermi yok. Her zaman mevcut.'},
+{id:'m2',cat:'melee',name:'KATANA',nameTR:'KATANA',icon:'⚔️',dmg:[30,44],rate:450,range:46,ammoMax:Infinity,reload:0,rarity:'uncommon',color:'#88ccff',effect:'bleed',desc:'Bleed on hit.',descTR:'Vuruşta kanar.'},
+{id:'m3',cat:'melee',name:'WARHAMMER',nameTR:'SAVAŞ ÇEKICI',icon:'🔨',dmg:[58,85],rate:950,range:42,ammoMax:Infinity,reload:0,rarity:'rare',color:'#aaaaaa',effect:'stun',desc:'Stuns enemies on hit.',descTR:'Vuruşta sersemletir.'},
+{id:'m4',cat:'melee',name:'CHAINSAW',nameTR:'TESTERE',icon:'🪚',dmg:[14,22],rate:90,range:38,ammoMax:Infinity,reload:0,rarity:'epic',color:'#ff8800',auto:true,effect:'burn',desc:'Rapid continuous damage.',descTR:'Hızlı sürekli hasar.'},
+{id:'m5',cat:'melee',name:'PLASMA BLADE',nameTR:'PLAZMA KILIÇ',icon:'🗡️',dmg:[75,115],rate:600,range:50,ammoMax:Infinity,reload:0,rarity:'legendary',color:'#ff40ff',effect:'burn',desc:'Energy blade. Massive damage.',descTR:'Enerji kılıcı. Büyük hasar.'},
+{id:'m6',cat:'melee',name:'VOID BLADE',nameTR:'BOŞ KILIÇ',icon:'🌌',dmg:[100,160],rate:700,range:50,ammoMax:Infinity,reload:0,rarity:'mythic',color:'#8800ff',effect:'stun',pierce:true,desc:'Cuts through all defenses.',descTR:'Tüm savunmaları keser.'},
+{id:'m7',cat:'melee',name:'BASEBALL BAT',nameTR:'BEYZBOL SOPASI',icon:'🏏',dmg:[25,38],rate:600,range:44,ammoMax:Infinity,reload:0,rarity:'common',color:'#cc8844',effect:'stun',desc:'Blunt force trauma.',descTR:'Künt kuvvet travması.'},
+{id:'m8',cat:'melee',name:'DAGGER',nameTR:'HANÇER',icon:'🗡️',dmg:[18,28],rate:200,range:32,ammoMax:Infinity,reload:0,rarity:'common',color:'#cccccc',crit:.2,desc:'Fast. High crit chance.',descTR:'Hızlı. Yüksek kritik şansı.'},
+{id:'m9',cat:'melee',name:'SCYTHE',nameTR:'TİRPAN',icon:'☠️',dmg:[55,80],rate:800,range:55,ammoMax:Infinity,reload:0,rarity:'rare',color:'#884400',effect:'bleed',desc:'Long range melee. Bleed.',descTR:'Uzun menzilli yakın dövüş.'},
+{id:'m10',cat:'melee',name:'ELECTRIC SPEAR',nameTR:'ELEKTRİK MIZI',icon:'⚡',dmg:[45,70],rate:700,range:52,ammoMax:Infinity,reload:0,rarity:'epic',color:'#ffff44',effect:'stun',desc:'Electric reach weapon.',descTR:'Elektrikli uzun silah.'},
+{id:'m11',cat:'melee',name:'ICE PICK',nameTR:'BUZ KAZICI',icon:'🧊',dmg:[35,55],rate:500,range:40,ammoMax:Infinity,reload:0,rarity:'rare',color:'#88ddff',effect:'freeze',crit:.15,desc:'Freezes on critical.',descTR:'Kritik vuruşta dondurur.'},
+{id:'m12',cat:'melee',name:'GRAVITY FIST',nameTR:'YERÇEKİMİ YUMRUĞU',icon:'🌍',dmg:[90,130],rate:1000,range:45,ammoMax:Infinity,reload:0,rarity:'mythic',color:'#44ff88',effect:'stun',desc:'Crush gravity itself.',descTR:'Yerçekimini ezer.'},
+];
+
+// ───────────────────────────────────────────────────────────────────────
+// ABILITIES — 100 abilities
+// ───────────────────────────────────────────────────────────────────────
+// Fields: id,name,nameTR,icon,key,cd(ms),energyCost,duration(ms),rarity,color,desc,descTR
+const ABILITIES = [
+// ── MOVEMENT (20) ─────────────────────────────────────────────
+{id:'a_dash',name:'DASH',nameTR:'ÇIĞLIK ATLAMASI',icon:'💨',cd:2500,ec:18,dur:160,rarity:'common',color:'#4488ff',desc:'Quick burst of speed.',descTR:'Hızlı ileri atılma.'},
+{id:'a_djump',name:'DOUBLE JUMP',nameTR:'ÇİFT ZIPLaMA',icon:'⬆️',cd:0,ec:10,dur:0,rarity:'common',color:'#44ccff',passive:true,desc:'[PASSIVE] Extra jump.',descTR:'[PASİF] Ekstra zıplama.'},
+{id:'a_wallslide',name:'WALL CLIMB',nameTR:'DUVAR TIRMANMA',icon:'🧗',cd:0,ec:5,dur:0,rarity:'common',color:'#88aaff',passive:true,desc:'[PASSIVE] Cling to walls.',descTR:'[PASİF] Duvarlara yapışma.'},
+{id:'a_blink',name:'BLINK',nameTR:'IŞINIM',icon:'🌀',cd:3500,ec:28,dur:0,rarity:'rare',color:'#aa44ff',desc:'Teleport to cursor.',descTR:'İmlece ışın.'},
+{id:'a_phase',name:'PHASE SHIFT',nameTR:'FAZ KAYMA',icon:'👻',cd:5000,ec:35,dur:1200,rarity:'epic',color:'#88ffcc',desc:'Phase through walls briefly.',descTR:'Kısa süre duvarlara girin.'},
+{id:'a_speed',name:'OVERDRIVE',nameTR:'AŞIRI VİTES',icon:'⚡',cd:7000,ec:30,dur:3000,rarity:'rare',color:'#ffff44',desc:'2× move speed.',descTR:'2× hareket hızı.'},
+{id:'a_vaulter',name:'VAULT',nameTR:'TAKAS ATLA',icon:'🤸',cd:4000,ec:20,dur:0,rarity:'uncommon',color:'#ffaa44',desc:'Long horizontal vault.',descTR:'Uzun yatay atlama.'},
+{id:'a_rocket_jump',name:'ROCKET JUMP',nameTR:'ROKET ATLAMA',icon:'🚀',cd:5000,ec:25,dur:0,rarity:'rare',color:'#ff8844',desc:'Explosive-propelled jump.',descTR:'Patlayıcı itişli atlama.'},
+{id:'a_grapple',name:'GRAPPLE',nameTR:'KAVRAMA',icon:'🪝',cd:3000,ec:20,dur:800,rarity:'rare',color:'#ffcc44',desc:'Hook to any surface.',descTR:'Herhangi bir yüzeye kanca.'},
+{id:'a_super_jump',name:'SUPER JUMP',nameTR:'SÜPER ZIPLaMA',icon:'🦘',cd:4500,ec:22,dur:0,rarity:'uncommon',color:'#44ddff',desc:'Triple jump height.',descTR:'Üç kat zıplama yüksekliği.'},
+{id:'a_roll',name:'BARREL ROLL',nameTR:'DÖNEL DALMA',icon:'🔄',cd:2000,ec:12,dur:300,rarity:'common',color:'#aaffaa',desc:'Rolling dodge.',descTR:'Yuvarlanarak kaçınma.'},
+{id:'a_sprint',name:'SPRINT',nameTR:'KOŞU',icon:'🏃',cd:6000,ec:25,dur:4000,rarity:'uncommon',color:'#ffcc88',desc:'Extended sprint speed.',descTR:'Uzun süreli koşu hızı.'},
+{id:'a_air_dash',name:'AIR DASH',nameTR:'HAVA ÇIĞLIĞI',icon:'💨',cd:3000,ec:20,dur:200,rarity:'rare',color:'#88ccff',desc:'Dash while airborne.',descTR:'Havada çiğlik atılımı.'},
+{id:'a_teleport_back',name:'RECALL',nameTR:'GERİ ÇAĞIRMA',icon:'↩️',cd:8000,ec:40,dur:0,rarity:'epic',color:'#ffaaff',desc:'Return to last safe position.',descTR:'Son güvenli konuma dön.'},
+{id:'a_momentum',name:'MOMENTUM',nameTR:'MOMENTUM',icon:'🏹',cd:0,ec:0,dur:0,rarity:'uncommon',passive:true,color:'#ffaa44',desc:'[PASSIVE] Gain speed while moving.',descTR:'[PASİF] Hareket ederken hız kazan.'},
+{id:'a_hover',name:'HOVER',nameTR:'SÜZÜLME',icon:'🕊️',cd:5000,ec:30,dur:2500,rarity:'rare',color:'#ccaaff',desc:'Float in mid-air.',descTR:'Havada süzülme.'},
+{id:'a_ground_slam',name:'GROUND SLAM',nameTR:'YER VURUŞU',icon:'⬇️',cd:4000,ec:22,dur:0,rarity:'rare',color:'#ff8844',desc:'Slam down, shockwave.',descTR:'Aşağı çarp, şok dalgası.'},
+{id:'a_swap',name:'POSITION SWAP',nameTR:'KONUM DEĞİŞİMİ',icon:'🔃',cd:9000,ec:45,dur:0,rarity:'epic',color:'#ff44ff',desc:'Swap position with enemy.',descTR:'Düşmanla yer değiştir.'},
+{id:'a_trail_fire',name:'FIRE TRAIL',nameTR:'ATEŞ İZİ',icon:'🔥',cd:6000,ec:28,dur:3000,rarity:'epic',color:'#ff6600',desc:'Leave burning trail behind.',descTR:'Arkanda ateş izi bırak.'},
+{id:'a_anti_grav',name:'ANTI-GRAVITY',nameTR:'ANTİ-GRAVİTE',icon:'🌐',cd:7000,ec:35,dur:4000,rarity:'epic',color:'#88ff88',desc:'Invert gravity for yourself.',descTR:'Kendi için yerçekimini ters çevir.'},
+
+// ── OFFENSE (20) ──────────────────────────────────────────────
+{id:'a_timeslow',name:'TIME SLOW',nameTR:'ZAMAN YAVAŞLATMA',icon:'⏳',cd:12000,ec:25,dur:5000,rarity:'rare',color:'#b060ff',desc:'Slow world to 20%.',descTR:'Dünyayı %20\'ye yavaşlat.'},
+{id:'a_berserk',name:'BERSERK',nameTR:'ÖFKE',icon:'😡',cd:15000,ec:50,dur:4000,rarity:'epic',color:'#ff2200',desc:'2× damage, ignore 50% dmg.',descTR:'2× hasar, %50 hasar görmezden gel.'},
+{id:'a_grenade',name:'GRENADE',nameTR:'EL BOMBASI',icon:'💣',cd:4000,ec:15,dur:0,rarity:'common',color:'#88ff44',desc:'Throw explosive grenade.',descTR:'Patlayıcı el bombası fırlat.'},
+{id:'a_napalm',name:'NAPALM STRIKE',nameTR:'NAPALM SALDIRISI',icon:'🔥',cd:14000,ec:60,dur:0,rarity:'legendary',color:'#ff4400',desc:'Carpet bomb the area.',descTR:'Bölgeye halı bombalaması yap.'},
+{id:'a_crits',name:'EAGLE EYE',nameTR:'KARTAL GÖZÜ',icon:'🦅',cd:8000,ec:30,dur:4000,rarity:'rare',color:'#ffff44',desc:'100% crit for 4 seconds.',descTR:'4 saniye için %100 kritik.'},
+{id:'a_multi_shot',name:'MULTI-SHOT',nameTR:'ÇOK ATIM',icon:'🔱',cd:5000,ec:28,dur:3000,rarity:'rare',color:'#ffaa44',desc:'Triple bullets fired.',descTR:'Üçlü mermi atışı.'},
+{id:'a_emp',name:'EMP BLAST',nameTR:'EMP PATLAMASI',icon:'⚡',cd:10000,ec:40,dur:0,rarity:'epic',color:'#ffff00',desc:'Stun enemy for 2s.',descTR:'Düşmanı 2s sersemlet.'},
+{id:'a_airstrike',name:'AIRSTRIKE',nameTR:'HAVA SALDIRISI',icon:'✈️',cd:18000,ec:70,dur:0,rarity:'legendary',color:'#ff6600',desc:'Carpet bomb strike.',descTR:'Halı bombalaması saldırısı.'},
+{id:'a_chain_lightning',name:'CHAIN LIGHTNING',nameTR:'ZİNCİR ŞIMŞEK',icon:'⚡',cd:7000,ec:35,dur:0,rarity:'epic',color:'#ffff44',desc:'Electric shockwave.',descTR:'Elektrikli şok dalgası.'},
+{id:'a_gravity_bomb',name:'GRAVITY BOMB',nameTR:'YERÇEKİMİ BOMBASI',icon:'🌍',cd:12000,ec:50,dur:0,rarity:'legendary',color:'#44ff88',desc:'Singularity explosion.',descTR:'Tekillik patlaması.'},
+{id:'a_nuke',name:'TACTICAL NUKE',nameTR:'TAKTİK NÜKLEER',icon:'☢️',cd:30000,ec:90,dur:0,rarity:'mythic',color:'#ff8800',desc:'Massive area destruction.',descTR:'Büyük alan yıkımı.'},
+{id:'a_summon',name:'DECOY',nameTR:'YALANCI HEDEF',icon:'👤',cd:9000,ec:30,dur:4000,rarity:'rare',color:'#ffaa44',desc:'Spawn decoy to confuse AI.',descTR:'Yapay zekayı kandırmak için yem oluştur.'},
+{id:'a_bullet_time',name:'BULLET TIME',nameTR:'MERMI ZAMANI',icon:'🕐',cd:10000,ec:35,dur:3000,rarity:'epic',color:'#ccaaff',desc:'You move full speed, world slow.',descTR:'Sen tam hızda, dünya yavaş.'},
+{id:'a_ricochet',name:'RICOCHET MODE',nameTR:'SEKTİRME MODU',icon:'🔵',cd:7000,ec:30,dur:4000,rarity:'rare',color:'#4499ff',desc:'All bullets bounce.',descTR:'Tüm mermiler sekilir.'},
+{id:'a_lifesteal',name:'LIFE STEAL',nameTR:'HAYAT ÇALMA',icon:'🧛',cd:8000,ec:25,dur:5000,rarity:'rare',color:'#ff44aa',desc:'Heal 15% of damage dealt.',descTR:'Verilen hasarın %15\'ini iyileştir.'},
+{id:'a_bloodrage',name:'BLOOD RAGE',nameTR:'KAN ÖFKESI',icon:'🩸',cd:12000,ec:45,dur:5000,rarity:'epic',color:'#cc0000',desc:'Damage boosts as you bleed.',descTR:'Kanama arttıkça hasar artar.'},
+{id:'a_execute',name:'EXECUTE',nameTR:'İNFAZ',icon:'⚔️',cd:15000,ec:60,dur:0,rarity:'legendary',color:'#ff2200',desc:'Instant kill below 20% HP.',descTR:'%20 HP altında anlık öldürme.'},
+{id:'a_mirror',name:'MIRROR IMAGE',nameTR:'AYNA GÖRÜNTÜ',icon:'🪞',cd:14000,ec:55,dur:5000,rarity:'legendary',color:'#ffffff',desc:'Reflect all incoming bullets.',descTR:'Gelen tüm mermileri yansıt.'},
+{id:'a_vortex',name:'VORTEX',nameTR:'GIRDAP',icon:'🌪️',cd:16000,ec:65,dur:0,rarity:'legendary',color:'#884488',desc:'Pull enemy to you.',descTR:'Düşmanı kendine çek.'},
+{id:'a_omega',name:'OMEGA STRIKE',nameTR:'OMEGA SALDIRISI',icon:'Ω',cd:25000,ec:80,dur:0,rarity:'mythic',color:'#ff00ff',desc:'Devastating single strike.',descTR:'Yıkıcı tek darbe.'},
+
+// ── DEFENSE (20) ──────────────────────────────────────────────
+{id:'a_shield',name:'ENERGY SHIELD',nameTR:'ENERJİ KALKANI',icon:'🛡️',cd:8000,ec:35,dur:2500,rarity:'uncommon',color:'#44ccff',desc:'Block all incoming bullets.',descTR:'Gelen tüm mermileri engelle.'},
+{id:'a_invis',name:'INVISIBILITY',nameTR:'GÖRÜNMEZLİK',icon:'👁️',cd:10000,ec:40,dur:4000,rarity:'rare',color:'#aaffff',desc:'Become invisible to AI.',descTR:'Yapay zekaya görünmez ol.'},
+{id:'a_heal',name:'HEAL',nameTR:'İYİLEŞME',icon:'💊',cd:14000,ec:55,dur:0,rarity:'uncommon',color:'#40ff80',desc:'Restore 40 HP.',descTR:'40 HP geri kazan.'},
+{id:'a_regen',name:'REGENERATION',nameTR:'YENİLENME',icon:'💚',cd:0,ec:0,dur:0,rarity:'rare',passive:true,color:'#44ff44',desc:'[PASSIVE] Slow HP regen.',descTR:'[PASİF] Yavaş HP yenilenmesi.'},
+{id:'a_overcharge',name:'OVERCHARGE',nameTR:'AŞIRI ŞARJ',icon:'⚡',cd:10000,ec:50,dur:4000,rarity:'epic',color:'#ffff00',desc:'Overshield: absorb extra damage.',descTR:'Fazla kalkan: ekstra hasar emer.'},
+{id:'a_armor',name:'IRON SKIN',nameTR:'DEMİR DERİ',icon:'🦾',cd:9000,ec:38,dur:5000,rarity:'rare',color:'#aaaaaa',desc:'Halve all incoming damage.',descTR:'Tüm gelen hasarı yarıya indir.'},
+{id:'a_clone',name:'CLONE',nameTR:'KLON',icon:'👥',cd:12000,ec:45,dur:5000,rarity:'epic',color:'#88ffff',desc:'Spawn a clone decoy.',descTR:'Klon yemi oluştur.'},
+{id:'a_counter',name:'COUNTER',nameTR:'KARŞI SALDIRI',icon:'🔄',cd:7000,ec:25,dur:1200,rarity:'rare',color:'#ff8844',desc:'Perfect block reflects damage.',descTR:'Mükemmel blok hasarı yansıtır.'},
+{id:'a_bubble',name:'STASIS BUBBLE',nameTR:'DONDURMA BALONU',icon:'🫧',cd:11000,ec:45,dur:3000,rarity:'epic',color:'#88ccff',desc:'Time-freeze bubble.',descTR:'Zaman dondurma balonu.'},
+{id:'a_thorns',name:'THORNS',nameTR:'DİKEN',icon:'🌵',cd:0,ec:0,dur:0,rarity:'rare',passive:true,color:'#44cc44',desc:'[PASSIVE] Reflect 20% damage.',descTR:'[PASİF] %20 hasar yansıt.'},
+{id:'a_second_life',name:'SECOND LIFE',nameTR:'İKİNCİ HAYAT',icon:'💫',cd:30000,ec:0,dur:0,rarity:'legendary',passive:true,color:'#ffdd00',desc:'[PASSIVE] Survive death once.',descTR:'[PASİF] Bir kez ölümden kaç.'},
+{id:'a_fortress',name:'FORTRESS',nameTR:'KALE',icon:'🏰',cd:15000,ec:60,dur:4000,rarity:'legendary',color:'#888888',desc:'Massive temp defense.',descTR:'Büyük geçici savunma.'},
+{id:'a_dodge_roll',name:'PERFECT DODGE',nameTR:'MÜKEMMEL KAÇINMA',icon:'💨',cd:4000,ec:18,dur:400,rarity:'uncommon',color:'#aaff88',desc:'Brief invincibility.',descTR:'Kısa süre dokunulmazlık.'},
+{id:'a_absorb',name:'ENERGY ABSORB',nameTR:'ENERJİ EMME',icon:'⚡',cd:8000,ec:0,dur:3000,rarity:'epic',color:'#88ffff',desc:'Convert damage to energy.',descTR:'Hasarı enerjiye dönüştür.'},
+{id:'a_decoy_bomb',name:'DECOY BOMB',nameTR:'YEM BOMBASI',icon:'💥',cd:8000,ec:30,dur:0,rarity:'rare',color:'#ffaa44',desc:'Decoy that explodes when hit.',descTR:'Vurulunca patlayan yem.'},
+{id:'a_smoke',name:'SMOKE SCREEN',nameTR:'DUMAN PERDESİ',icon:'💨',cd:6000,ec:22,dur:3000,rarity:'rare',color:'#888888',desc:'Fog of war around you.',descTR:'Etrafında savaş sisi.'},
+{id:'a_temporal_shield',name:'TIME SHIELD',nameTR:'ZAMAN KALKANI',icon:'⏱️',cd:14000,ec:55,dur:2000,rarity:'legendary',color:'#aaaaff',desc:'Rewind damage taken.',descTR:'Alınan hasarı geri al.'},
+{id:'a_barrier',name:'FORCE BARRIER',nameTR:'KUVVETLİ ENGEL',icon:'🔒',cd:10000,ec:40,dur:3500,rarity:'epic',color:'#4488ff',desc:'Impenetrable wall.',descTR:'Geçilmez duvar.'},
+{id:'a_phoenix',name:'PHOENIX FLAME',nameTR:'FENİKS ALEVI',icon:'🦅',cd:25000,ec:80,dur:0,rarity:'mythic',color:'#ff8800',desc:'Revive with full HP.',descTR:'Tam HP ile dirilen.'},
+{id:'a_immortal',name:'IMMORTALITY',nameTR:'ÖLÜMSÜZLÜK',icon:'♾️',cd:30000,ec:100,dur:2000,rarity:'mythic',color:'#ffdd00',desc:'Unkillable for 2 seconds.',descTR:'2 saniye öldürülemez.'},
+
+// ── UTILITY (20) ──────────────────────────────────────────────
+{id:'a_scan',name:'ENEMY SCAN',nameTR:'DÜŞMAN TARAMA',icon:'📡',cd:8000,ec:20,dur:5000,rarity:'uncommon',color:'#44ffaa',desc:'Reveal enemy position.',descTR:'Düşman konumunu ortaya çıkar.'},
+{id:'a_cdr',name:'COOLDOWN RUSH',nameTR:'BEKLEME İNDİRGEME',icon:'⏩',cd:20000,ec:50,dur:0,rarity:'epic',color:'#ffcc44',desc:'Reset all ability cooldowns.',descTR:'Tüm yetenek bekleme sürelerini sıfırla.'},
+{id:'a_energy_burst',name:'ENERGY BURST',nameTR:'ENERJİ PATLAMASI',icon:'💥',cd:10000,ec:0,dur:0,rarity:'rare',color:'#4488ff',desc:'Restore all energy instantly.',descTR:'Tüm enerjiyi anında geri kazan.'},
+{id:'a_gravity_shift',name:'GRAVITY SHIFT',nameTR:'YERÇEKİMİ KAYMASI',icon:'🌍',cd:7000,ec:30,dur:5000,rarity:'rare',color:'#44ff88',desc:'Halve gravity globally.',descTR:'Yerçekimini global yarıya indir.'},
+{id:'a_magnet',name:'MAGNET',nameTR:'MAGNET',icon:'🧲',cd:5000,ec:25,dur:3000,rarity:'rare',color:'#ff8888',desc:'Pull all projectiles toward you.',descTR:'Tüm mermileri kendine çek.'},
+{id:'a_hack',name:'SYSTEM HACK',nameTR:'SİSTEM HACK',icon:'💻',cd:12000,ec:45,dur:3000,rarity:'epic',color:'#44ff44',desc:'Disable AI abilities temporarily.',descTR:'Yapay zeka yeteneklerini geçici devre dışı bırak.'},
+{id:'a_ammo_drop',name:'AMMO DROP',nameTR:'MERMİ DÜŞÜRME',icon:'📦',cd:9000,ec:30,dur:0,rarity:'uncommon',color:'#ffcc44',desc:'Instantly full ammo.',descTR:'Anında tam mermi.'},
+{id:'a_overdrive_rounds',name:'OVERDRIVE ROUNDS',nameTR:'AŞIRI ATIMLAR',icon:'⚡',cd:8000,ec:35,dur:4000,rarity:'rare',color:'#ffff44',desc:'+50% fire rate.',descTR:'+%50 ateş hızı.'},
+{id:'a_armor_break',name:'ARMOR BREAK',nameTR:'ZIRH KIRMA',icon:'💥',cd:7000,ec:28,dur:4000,rarity:'rare',color:'#ff8844',desc:'Enemy takes double damage.',descTR:'Düşman çift hasar alır.'},
+{id:'a_leech_aura',name:'LEECH AURA',nameTR:'EMİCİ AURAsi',icon:'🔴',cd:0,ec:0,dur:0,rarity:'rare',passive:true,color:'#ff4488',desc:'[PASSIVE] 8% lifesteal on all dmg.',descTR:'[PASİF] Tüm hasarda %8 hayat çalma.'},
+{id:'a_explosive_rounds',name:'EXPLOSIVE ROUNDS',nameTR:'PATLAYICI MERMİLER',icon:'💥',cd:9000,ec:40,dur:4000,rarity:'epic',color:'#ff6600',desc:'All bullets explode on impact.',descTR:'Tüm mermiler çarpışınca patlar.'},
+{id:'a_berserker_rounds',name:'SHREDDER',nameTR:'PARÇALAYICI',icon:'🔴',cd:10000,ec:42,dur:5000,rarity:'epic',color:'#ff2200',desc:'Triple damage, triple spread.',descTR:'Üçlü hasar, üçlü yayılma.'},
+{id:'a_time_warp',name:'TIME WARP',nameTR:'ZAMAN ÇARPITMA',icon:'⌛',cd:18000,ec:65,dur:6000,rarity:'legendary',color:'#aa88ff',desc:'Distort time around enemy.',descTR:'Düşman etrafında zamanı çarpıt.'},
+{id:'a_supply_drop',name:'SUPPLY DROP',nameTR:'İKMAL DÜŞÜRME',icon:'📦',cd:20000,ec:60,dur:0,rarity:'legendary',color:'#ffdd88',desc:'Random legendary weapon.',descTR:'Rastgele efsanevi silah.'},
+{id:'a_rewind',name:'TIME REWIND',nameTR:'ZAMAN GERİ SARMA',icon:'⏪',cd:20000,ec:70,dur:0,rarity:'legendary',color:'#8888ff',desc:'Rewind your position 3s.',descTR:'Konumunu 3s geri sar.'},
+{id:'a_zone',name:'CONTROL ZONE',nameTR:'KONTROL BÖLGESİ',icon:'🔵',cd:14000,ec:55,dur:6000,rarity:'epic',color:'#4488ff',desc:'Zone that slows enemy entry.',descTR:'Düşmanın girişini yavaşlatan bölge.'},
+{id:'a_quantum',name:'QUANTUM LEAP',nameTR:'KUANTUM SIÇRAMA',icon:'⚛️',cd:6000,ec:30,dur:0,rarity:'rare',color:'#44ffcc',desc:'Random teleport.',descTR:'Rastgele ışınlanma.'},
+{id:'a_combo_reset',name:'COMBO SAVER',nameTR:'KOMBO KURTARICI',icon:'🔄',cd:15000,ec:35,dur:0,rarity:'epic',color:'#ffcc00',desc:'Keep combo on hit taken.',descTR:'Vurulunca komboyu koru.'},
+{id:'a_warp_zone',name:'WARP FIELD',nameTR:'ÇARPITMA ALANI',icon:'🌊',cd:18000,ec:70,dur:5000,rarity:'legendary',color:'#ff00ff',desc:'Bend all projectiles to cursor.',descTR:'Tüm mermileri imleçe büküm.'},
+{id:'a_omnipotence',name:'OMNIPOTENCE',nameTR:'TAM GÜÇLÜLÜK',icon:'💎',cd:45000,ec:100,dur:4000,rarity:'mythic',color:'#ffffff',desc:'ALL abilities active simultaneously.',descTR:'TÜM yetenekler aynı anda aktif.'},
+
+// ── AREA CONTROL (20) ─────────────────────────────────────────
+{id:'a_mine',name:'PROXIMITY MINE',nameTR:'YAKLAŞIM MAYINİ',icon:'💣',cd:5000,ec:18,dur:0,rarity:'uncommon',color:'#ff8800',desc:'Plant explosive mine.',descTR:'Patlayıcı mayın yerleştir.'},
+{id:'a_turret',name:'TURRET',nameTR:'KULE',icon:'🔫',cd:18000,ec:65,dur:8000,rarity:'legendary',color:'#888888',desc:'Auto-targeting turret.',descTR:'Otomatik hedefleme kulesi.'},
+{id:'a_slow_field',name:'SLOW FIELD',nameTR:'YAVAŞLAMA ALANI',icon:'🌀',cd:10000,ec:40,dur:5000,rarity:'rare',color:'#aa44ff',desc:'Zone that slows enemy.',descTR:'Düşmanı yavaşlatan bölge.'},
+{id:'a_electric_field',name:'ELECTRIC FIELD',nameTR:'ELEKTRİK ALANI',icon:'⚡',cd:11000,ec:45,dur:4000,rarity:'epic',color:'#ffff44',desc:'Shocking trap zone.',descTR:'Şok kapanı bölgesi.'},
+{id:'a_poison_cloud',name:'POISON CLOUD',nameTR:'ZEHİR BULUTU',icon:'☠️',cd:8000,ec:30,dur:4000,rarity:'rare',color:'#44ff44',desc:'Toxic area of denial.',descTR:'Zehirli inkâr alanı.'},
+{id:'a_ice_wall',name:'ICE WALL',nameTR:'BUZ DUVARI',icon:'🧊',cd:12000,ec:45,dur:5000,rarity:'epic',color:'#88ddff',desc:'Wall of ice, blocks movement.',descTR:'Hareketi engelleyen buz duvarı.'},
+{id:'a_fire_ring',name:'FIRE RING',nameTR:'ATEŞ YÜZÜĞÜ',icon:'🔥',cd:10000,ec:38,dur:4000,rarity:'rare',color:'#ff6600',desc:'Ring of fire around you.',descTR:'Etrafınızdaki ateş halkası.'},
+{id:'a_quake',name:'EARTHQUAKE',nameTR:'DEPREM',icon:'🌋',cd:14000,ec:55,dur:0,rarity:'legendary',color:'#884400',desc:'Shockwave through platforms.',descTR:'Platformlar boyunca şok dalgası.'},
+{id:'a_black_hole',name:'BLACK HOLE',nameTR:'KARA DELİK',icon:'🌑',cd:15000,ec:60,dur:4000,rarity:'legendary',color:'#6600cc',desc:'Gravity well pulls all.',descTR:'Kara delik herkesi çeker.'},
+{id:'a_plasma_field',name:'PLASMA FIELD',nameTR:'PLAZMA ALANI',icon:'💙',cd:10000,ec:40,dur:4000,rarity:'epic',color:'#4466ff',desc:'Burning plasma wall.',descTR:'Yanan plazma duvarı.'},
+{id:'a_gravity_well',name:'GRAVITY PULSE',nameTR:'YERÇEKİMİ NABIZ',icon:'🌍',cd:8000,ec:32,dur:0,rarity:'rare',color:'#44ff88',desc:'Shockwave push.',descTR:'Şok dalgası itiş.'},
+{id:'a_time_bomb',name:'TIME BOMB',nameTR:'ZAMAN BOMBASI',icon:'⏱️',cd:12000,ec:50,dur:0,rarity:'epic',color:'#ccaaff',desc:'Delayed explosion.',descTR:'Gecikmeli patlama.'},
+{id:'a_web',name:'VOID WEB',nameTR:'BOŞ AĞ',icon:'🕸️',cd:8000,ec:30,dur:4000,rarity:'rare',color:'#8844ff',desc:'Trap that roots enemy.',descTR:'Düşmanı kitleyen tuzak.'},
+{id:'a_nova',name:'VOID NOVA',nameTR:'BOŞ NOVA',icon:'💫',cd:16000,ec:65,dur:0,rarity:'legendary',color:'#8800ff',desc:'Expanding void explosion.',descTR:'Genişleyen boşluk patlaması.'},
+{id:'a_nanoswarm',name:'NANOSWARM',nameTR:'NANO SÜRÜ',icon:'🐝',cd:12000,ec:48,dur:4000,rarity:'epic',color:'#ffff44',desc:'Swarm of nano-drones.',descTR:'Nano insansız hava aracı sürüsü.'},
+{id:'a_cryo_field',name:'CRYO FIELD',nameTR:'KRİYO ALANI',icon:'❄️',cd:12000,ec:48,dur:4000,rarity:'epic',color:'#88ddff',desc:'Freeze zone.',descTR:'Dondurma bölgesi.'},
+{id:'a_meteor',name:'METEOR RAIN',nameTR:'METEOR YAĞMURU',icon:'☄️',cd:20000,ec:75,dur:0,rarity:'mythic',color:'#ff8800',desc:'Meteor shower attack.',descTR:'Meteor yağmuru saldırısı.'},
+{id:'a_reality_shatter',name:'REALITY SHATTER',nameTR:'GERÇEKLİK KIRMA',icon:'💥',cd:25000,ec:85,dur:0,rarity:'mythic',color:'#ff00ff',desc:'Shatter reality. Massive AoE.',descTR:'Gerçekliği kır. Büyük AoE.'},
+{id:'a_time_stop',name:'TIME STOP',nameTR:'ZAMAN DURDURMA',icon:'⏹️',cd:30000,ec:90,dur:3000,rarity:'mythic',color:'#aaaaff',desc:'Completely freeze enemy.',descTR:'Düşmanı tamamen dondur.'},
+{id:'a_singularity',name:'SINGULARITY BOMB',nameTR:'TEKİLLİK BOMBASI',icon:'🌌',cd:35000,ec:100,dur:0,rarity:'mythic',color:'#ff00aa',desc:'Tear space-time.',descTR:'Uzay-zamanı yırt.'},
+];
+
+// ───────────────────────────────────────────────────────────────────────
+// MAP THEMES — 10 procedural themes
+// ───────────────────────────────────────────────────────────────────────
+const MAP_THEMES = [
+  {id:'neon',name:'NEON CITY',sky:['#040012','#080020'],ground:'#0a0022',plat:'#1a0040',platTop:'#5010ff',glow:'#5010ff',star:true},
+  {id:'wasteland',name:'WASTELAND',sky:['#120806','#1e0e06'],ground:'#190e04',plat:'#381c08',platTop:'#7a3c18',glow:'#ff5a14',dust:true},
+  {id:'void',name:'THE VOID',sky:['#000008','#00000e'],ground:'#050510',plat:'#0a0a20',platTop:'#1818ff',glow:'#1820ff',star:true},
+  {id:'jungle',name:'CYBER JUNGLE',sky:['#041008','#081a0a'],ground:'#091d07',plat:'#0d2808',platTop:'#18c038',glow:'#18c038',rain:true},
+  {id:'ice',name:'FROZEN RIFT',sky:['#08101a','#0c1828'],ground:'#0c1828',plat:'#182c40',platTop:'#58a8ff',glow:'#58a8ff',star:true},
+  {id:'lava',name:'LAVA CORE',sky:['#160402','#200602'],ground:'#180600',plat:'#2c0a02',platTop:'#ff3800',glow:'#ff3800'},
+  {id:'glitch',name:'GLITCH ZONE',sky:['#080012','#10001a'],ground:'#090010',plat:'#180028',platTop:'#ff00ff',glow:'#ff00ff',glitch:true,star:true},
+  {id:'desert',name:'DEAD DESERT',sky:['#1a1008','#2a1a0a'],ground:'#1a1008',plat:'#2a1a0a',platTop:'#c89040',glow:'#c89040',dust:true},
+  {id:'cyber',name:'CYBER CORE',sky:['#020814','#04101e'],ground:'#021018',plat:'#041828',platTop:'#00d8ff',glow:'#00d8ff',star:true},
+  {id:'blood',name:'BLOOD ARENA',sky:['#100004','#180004'],ground:'#100004',plat:'#200008',platTop:'#cc0020',glow:'#cc0020'},
+];
+
+// ───────────────────────────────────────────────────────────────────────
+// ROUND MODIFIERS — 16 modifiers
+// ───────────────────────────────────────────────────────────────────────
+const MODIFIERS = [
+  {id:'low_grav',icon:'🌙',name:'LOW GRAVITY',nameTR:'DÜŞÜK YERÇEKİMİ',color:'#88aaff',gravMult:.45,desc:'Gravity 45%'},
+  {id:'high_grav',icon:'⬇️',name:'HIGH GRAVITY',nameTR:'YÜKSEK YERÇEKİMİ',color:'#ff8844',gravMult:1.8,desc:'Gravity 180%'},
+  {id:'double_speed',icon:'⚡',name:'DOUBLE SPEED',nameTR:'ÇİFT HIZ',color:'#ffff44',speedMult:2,desc:'Move 2× faster'},
+  {id:'fog',icon:'🌫️',name:'FOG OF WAR',nameTR:'SAVAŞ SİSİ',color:'#aaaaaa',fog:true,desc:'Limited visibility'},
+  {id:'glass_cannon',icon:'💎',name:'GLASS CANNON',nameTR:'CAM TOP',color:'#44ffcc',dmgMult:2,selfDmgMult:2,desc:'+100% dmg, +100% taken'},
+  {id:'inf_ammo',icon:'∞',name:'INFINITE AMMO',nameTR:'SONSUZ MERMİ',color:'#40ff80',infiniteAmmo:true,desc:'No reloading'},
+  {id:'big_head',icon:'🗿',name:'BIG HEAD MODE',nameTR:'BÜYÜK KAFA',color:'#ff8844',bigHead:true,desc:'3× crit hitbox'},
+  {id:'lifesteal',icon:'🧛',name:'LIFE STEAL',nameTR:'HAYAT ÇALMA',color:'#ff44aa',lifeSteal:.15,desc:'15% lifesteal on dmg'},
+  {id:'super_jump',icon:'🦘',name:'SUPER JUMP',nameTR:'SÜPER SIÇRAMA',color:'#44ddff',jumpMult:1.8,desc:'Jump 1.8× higher'},
+  {id:'bullet_rain',icon:'🌧️',name:'BULLET RAIN',nameTR:'MERMİ YAĞMURU',color:'#ff6060',enemyFireMult:.5,desc:'Enemy fires 2× faster'},
+  {id:'random_weapons',icon:'🎲',name:'CHAOS WEAPONS',nameTR:'KAOS SİLAHLAR',color:'#ff44ff',chaosWeapons:true,desc:'Weapons swap every 10s'},
+  {id:'one_hp',icon:'💔',name:'ONE HIT',nameTR:'TEK DARBE',color:'#ff2244',oneHit:true,desc:'One crit = instant death'},
+  {id:'regen',icon:'💚',name:'REGENERATION',nameTR:'YENİLENME',color:'#44ff44',regen:true,desc:'HP regens slowly'},
+  {id:'slow_bullets',icon:'🐌',name:'SLOW BULLETS',nameTR:'YAVAŞ MERMİLER',color:'#aaaaaa',slowBullets:.4,desc:'All bullets 40% speed'},
+  {id:'combo_fever',icon:'🔥',name:'COMBO FEVER',nameTR:'KOMBO ATEŞİ',color:'#ff8800',comboFever:true,desc:'Combo multiplies fire rate'},
+  {id:'mirror_match',icon:'🪞',name:'MIRROR MATCH',nameTR:'AYNA MAÇI',color:'#ffffff',mirrorMatch:true,desc:'Enemy has your exact loadout'},
+];
+
+// ───────────────────────────────────────────────────────────────────────
+// AI DIFFICULTY CONFIG
+// ───────────────────────────────────────────────────────────────────────
+const DIFF = {
+  easy:   {aimErr:90,react:900,aggr:.35,retreatD:50,dodge:.04,stratMs:3500,hpMult:.75,dmgMult:.7,label:'EASY',color:'#28e868'},
+  normal: {aimErr:42,react:460,aggr:.58,retreatD:85,dodge:.13,stratMs:2200,hpMult:1.0,dmgMult:1.0,label:'NORMAL',color:'#ffcc28'},
+  hard:   {aimErr:18,react:240,aggr:.76,retreatD:110,dodge:.25,stratMs:1400,hpMult:1.3,dmgMult:1.2,label:'HARD',color:'#ff6818'},
+  extreme:{aimErr:4, react:70, aggr:.96,retreatD:140,dodge:.44,stratMs:700, hpMult:1.7,dmgMult:1.5,label:'EXTREME',color:'#ff2a4a'},
+};
+
+// ───────────────────────────────────────────────────────────────────────
+// UTILITY
+// ───────────────────────────────────────────────────────────────────────
+const rnd  = (a,b)=>a+Math.random()*(b-a);
+const ri   = (a,b)=>Math.floor(rnd(a,b+1));
+const clmp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const pick = a=>a[Math.floor(Math.random()*a.length)];
+const lerp = (a,b,t)=>a+(b-a)*t;
+const dst  = (a,b)=>Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2);
+const now  = ()=>performance.now();
+
+function weightedPickWeapon(){
+  const w={common:46,uncommon:26,rare:14,epic:8,legendary:4,mythic:hasUnlock('mythic_unlock')?2:0};
+  if(hasUnlock('leg_boost')){w.legendary+=6;}
+  const pool=WEAPONS.filter(x=>w[x.rarity]>0);
+  const total=pool.reduce((s,x)=>s+(w[x.rarity]||0),0);
+  let r=Math.random()*total;
+  for(const x of pool){r-=w[x.rarity]||0;if(r<=0)return x;}
+  return pool[0];
+}
+function weightedPickAbility(){
+  const w={common:44,uncommon:26,rare:16,epic:9,legendary:4,mythic:hasUnlock('mythic_unlock')?1:0};
+  if(hasUnlock('leg_boost')){w.legendary+=6;}
+  const pool=ABILITIES.filter(x=>w[x.rarity]>0);
+  const total=pool.reduce((s,x)=>s+(w[x.rarity]||0),0);
+  let r=Math.random()*total;
+  for(const x of pool){r-=w[x.rarity]||0;if(r<=0)return x;}
+  return pool[0];
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// SCREEN MANAGEMENT
+// ───────────────────────────────────────────────────────────────────────
+let currentDiff='normal';
+let currentLobby=null;
+let rerollsLeft=1;
+let GS=null; // game state
+let animId=null;
+
+function showScr(id){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  const el=document.getElementById(id);
+  if(el) el.classList.add('on');
+  document.getElementById('game-canvas-wrap').classList.toggle('on',id==='game');
+  document.getElementById('hud').classList.toggle('on',id==='game');
+  document.getElementById('hud-bottom').style.display=id==='game'?'flex':'none';
+}
+
+function setDiff(d){
+  currentDiff=d;
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.toggle('on',b.dataset.d===d));
+}
+
+function startFlow(mode){
+  rerollsLeft=hasUnlock('reroll2')?2:1;
+  rollLobby();
+  showScr('scr-lobby');
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// LOBBY
+// ───────────────────────────────────────────────────────────────────────
+function rollLobby(){
+  const theme=pick(MAP_THEMES);
+  const wCount=hasUnlock('triple_wep')?3:2;
+  const aCount=hasUnlock('4abilities')?4:ri(2,3);
+
+  // Player weapons (no duplicate categories)
+  const usedCats=new Set();
+  const pWeapons=[];
+  let attempts=0;
+  while(pWeapons.length<wCount&&attempts<200){
+    attempts++;
+    const w=weightedPickWeapon();
+    if(!usedCats.has(w.cat)){pWeapons.push(w);usedCats.add(w.cat);}
+  }
+
+  // Player abilities (no dupes)
+  const pAbils=[];
+  const usedAbils=new Set();
+  attempts=0;
+  while(pAbils.length<aCount&&attempts<200){
+    attempts++;
+    const a=weightedPickAbility();
+    if(!usedAbils.has(a.id)){pAbils.push(a);usedAbils.add(a.id);}
+  }
+
+  // Enemy weapons
+  const eUsed=new Set();
+  const eWeapons=[];
+  attempts=0;
+  while(eWeapons.length<2&&attempts<200){
+    attempts++;
+    const w=weightedPickWeapon();
+    if(!eUsed.has(w.cat)){eWeapons.push(w);eUsed.add(w.cat);}
+  }
+
+  // Modifiers (1-2, not contradictory)
+  const mods=[];
+  const usedMods=new Set();
+  const modCount=ri(1,2);
+  attempts=0;
+  while(mods.length<modCount&&attempts<200){
+    attempts++;
+    const m=pick(MODIFIERS);
+    if(!usedMods.has(m.id)){
+      // Avoid conflicting pairs
+      const conflicts={low_grav:'high_grav',high_grav:'low_grav',glass_cannon:'one_hp'};
+      if(!mods.find(x=>x.id===conflicts[m.id])){
+        mods.push(m);usedMods.add(m.id);
+      }
+    }
+  }
+
+  currentLobby={theme,pWeapons,pAbils,eWeapons,mods,diff:currentDiff};
+  renderLobby();
+}
+
+function reroll(){
+  if(rerollsLeft<=0)return;
+  rerollsLeft--;
+  document.getElementById('rerolls-left').textContent=rerollsLeft;
+  rollLobby();
+}
+
+function rarityBadge(r){
+  return `<span class="ir-badge ${RARITY_CLS[r]}">${r.toUpperCase()}</span>`;
+}
+
+function renderLobby(){
+  const {theme,pWeapons,pAbils,eWeapons,mods}=currentLobby;
+  document.getElementById('lob-theme-label').textContent=`MAP: ${theme.name}`;
+
+  // Weapons
+  document.getElementById('lob-weapons').innerHTML=pWeapons.map(w=>`
+    <div class="item-row">
+      <span class="ir-icon">${w.icon}</span>
+      <div class="ir-info">
+        <div class="ir-name">${LANG==='tr'?w.nameTR:w.name}</div>
+        <div class="ir-desc">${LANG==='tr'?w.descTR:w.desc} | DMG ${w.dmg[0]}-${w.dmg[1]}</div>
+      </div>
+      ${rarityBadge(w.rarity)}
+    </div>`).join('');
+
+  // Abilities
+  document.getElementById('lob-abilities').innerHTML=pAbils.map((a,i)=>`
+    <div class="item-row">
+      <span class="ir-icon">${a.icon}</span>
+      <div class="ir-info">
+        <div class="ir-name">[${i+1}] ${LANG==='tr'?a.nameTR:a.name}</div>
+        <div class="ir-desc">${LANG==='tr'?a.descTR:a.desc}</div>
+      </div>
+      ${rarityBadge(a.rarity)}
+    </div>`).join('');
+
+  // Enemy
+  document.getElementById('lob-enemy').innerHTML=eWeapons.map(w=>`
+    <div class="item-row">
+      <span class="ir-icon">${w.icon}</span>
+      <div class="ir-info">
+        <div class="ir-name">${LANG==='tr'?w.nameTR:w.name}</div>
+        <div class="ir-desc">${w.cat.toUpperCase()} | ${w.rarity.toUpperCase()}</div>
+      </div>
+      ${rarityBadge(w.rarity)}
+    </div>`).join('');
+
+  // Modifiers
+  document.getElementById('lob-mods').innerHTML=mods.map(m=>`
+    <div class="mod-chip">
+      <span class="mod-icon">${m.icon}</span>
+      ${LANG==='tr'?m.nameTR:m.name}
+    </div>`).join('');
+
+  // Map preview
+  drawMapPreview(theme);
+
+  // Reroll btn
+  document.getElementById('reroll-btn').disabled=rerollsLeft<=0;
+}
+
+function drawMapPreview(theme){
+  const c=document.getElementById('map-prev');
+  const cx=c.getContext('2d');
+  const W=230,H=90;
+  const sg=cx.createLinearGradient(0,0,0,H);
+  sg.addColorStop(0,theme.sky[0]||theme.sky);
+  sg.addColorStop(1,theme.sky[1]||theme.sky);
+  cx.fillStyle=sg; cx.fillRect(0,0,W,H);
+  // Mini platforms
+  [[0,65,W,25],[32,46,66,7],[112,36,72,7],[182,46,48,7],[70,28,60,7]].forEach(([x,y,w,h])=>{
+    cx.fillStyle=theme.plat||'#111122'; cx.fillRect(x,y,w,h);
+    cx.fillStyle=theme.platTop||'#4444ff'; cx.fillRect(x,y,w,2);
+  });
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// PROGRESSION SCREEN
+// ───────────────────────────────────────────────────────────────────────
+function renderProgScreen(){
+  const xpN=XP_TABLE(PROG.level);
+  document.getElementById('prog-level-label').textContent=
+    `LEVEL ${PROG.level} — ${PROG.xp} / ${xpN} XP`;
+  document.getElementById('prog-xp-bar').style.width=(PROG.xp/xpN*100)+'%';
+
+  document.getElementById('prog-stats').innerHTML=`
+    <div class="stat-card"><div class="sc-label">${t('total_kills')}</div><div class="sc-val">${PROG.totalKills}</div></div>
+    <div class="stat-card"><div class="sc-label">${t('total_matches')}</div><div class="sc-val">${PROG.totalMatches}</div></div>
+    <div class="stat-card"><div class="sc-label">${t('hiscore')}</div><div class="sc-val">${PROG.hiScore}</div></div>
+    <div class="stat-card"><div class="sc-label">${t('total_waves')}</div><div class="sc-val">${PROG.totalWaves}</div></div>
+  `;
+
+  document.getElementById('prog-unlocks').innerHTML=UNLOCK_DEFS.map(u=>
+    `<div class="unlock-badge ${PROG.unlocked.includes(u.id)?'earned':''}" title="${u.desc}">
+      ${LANG==='tr'?u.nameTR:u.name}<br>
+      <span style="font-size:3.5px;color:var(--dim)">${PROG.level>=u.req?'✓ LV'+u.req:'LV'+u.req+' REQUIRED'}</span>
+    </div>`).join('');
+  document.getElementById('menu-hi').textContent=PROG.hiScore;
+  document.getElementById('menu-lv').textContent=PROG.level;
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// CODEX SCREEN
+// ───────────────────────────────────────────────────────────────────────
+let codexMode='weapons';
+function codexTab(m){
+  codexMode=m;
+  document.querySelectorAll('#codex-tabs .btn').forEach((b,i)=>{
+    b.className='btn btn-sm '+((['weapons','abilities'][i]===m)?'btn-blue':'btn-dim');
+  });
+  renderCodex();
+}
+function renderCodex(){
+  const cont=document.getElementById('codex-content');
+  if(codexMode==='weapons'){
+    const cats=[...new Set(WEAPONS.map(w=>w.cat))];
+    cont.innerHTML=cats.map(cat=>`
+      <div style="margin-bottom:12px;">
+        <div style="font-family:var(--font-px);font-size:6px;color:var(--dim);margin-bottom:5px;letter-spacing:2px;">
+          ${cat.toUpperCase()} (${WEAPONS.filter(w=>w.cat===cat).length})
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px;">
+          ${WEAPONS.filter(w=>w.cat===cat).map(w=>`
+            <div style="background:var(--panel);border:1px solid var(--border);padding:7px 8px;display:flex;gap:6px;align-items:center;">
+              <span style="font-size:14px;">${w.icon}</span>
+              <div style="flex:1;">
+                <div style="font-family:var(--font-px);font-size:5px;color:#fff;">${LANG==='tr'?w.nameTR:w.name}</div>
+                <div style="font-size:10px;color:var(--dim);">DMG ${w.dmg[0]}-${w.dmg[1]} | ${w.rarity.toUpperCase()}</div>
+              </div>
+              <span class="${RARITY_CLS[w.rarity]}" style="font-size:10px;font-family:var(--font-px);">●</span>
+            </div>`).join('')}
+        </div>
+      </div>`).join('');
+  } else {
+    const cats=['movement','offense','defense','utility','area'];
+    const catBuckets=ABILITIES.reduce((acc,a,i)=>{
+      const ci=Math.floor(i/20);
+      const cname=cats[ci]||'misc';
+      if(!acc[cname])acc[cname]=[];
+      acc[cname].push(a); return acc;
+    },{});
+    cont.innerHTML=Object.entries(catBuckets).map(([cat,abs])=>`
+      <div style="margin-bottom:12px;">
+        <div style="font-family:var(--font-px);font-size:6px;color:var(--dim);margin-bottom:5px;letter-spacing:2px;">
+          ${cat.toUpperCase()} (${abs.length})
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px;">
+          ${abs.map(a=>`
+            <div style="background:var(--panel);border:1px solid var(--border);padding:7px 8px;display:flex;gap:6px;align-items:center;">
+              <span style="font-size:14px;">${a.icon}</span>
+              <div style="flex:1;">
+                <div style="font-family:var(--font-px);font-size:5px;color:#fff;">${LANG==='tr'?a.nameTR:a.name}</div>
+                <div style="font-size:10px;color:var(--dim);">${a.rarity.toUpperCase()}</div>
+              </div>
+              <span class="${RARITY_CLS[a.rarity]}" style="font-size:10px;font-family:var(--font-px);">●</span>
+            </div>`).join('')}
+        </div>
+      </div>`).join('');
+  }
+}
+
+function toggleSetting(k,v){PROG.settings[k]=v;saveProg();}
+
+// ───────────────────────────────────────────────────────────────────────
+// GAME ENGINE
+// ───────────────────────────────────────────────────────────────────────
+const gc=document.getElementById('gc');
+const ctx=gc.getContext('2d');
+ctx.imageSmoothingEnabled=false;
+const CW=960,CH=540;
+const FLOOR_Y=420;
+const G_BASE=0.58;
+
+function beginRound(){
+  if(!currentLobby)return;
+  if(animId)cancelAnimationFrame(animId);
+  showScr('game');
+  initGame(currentLobby);
+}
+
+function initGame(lobby){
+  const diff=DIFF[lobby.diff||'normal'];
+  const mods=lobby.mods;
+  const hasMod=id=>mods.some(m=>m.id===id);
+  const modVal=(id,key,def)=>{const m=mods.find(x=>x.id===id);return m?m[key]:def;};
+
+  // Apply modifiers
+  const gravMult=mods.reduce((v,m)=>m.gravMult?m.gravMult:v,1);
+  const speedMult=mods.reduce((v,m)=>m.speedMult?m.speedMult:v,1);
+  const jumpMult=mods.reduce((v,m)=>m.jumpMult?m.jumpMult:v,1);
+  const dmgMult=mods.reduce((v,m)=>m.dmgMult?m.dmgMult:v,1);
+  const selfDmgMult=mods.reduce((v,m)=>m.selfDmgMult?m.selfDmgMult:v,1);
+  const infiniteAmmo=hasMod('inf_ammo');
+  const lifeSteal=mods.reduce((v,m)=>m.lifeSteal?m.lifeSteal:v,0);
+  const fog=hasMod('fog');
+  const bigHead=hasMod('big_head');
+  const oneHit=hasMod('one_hit');
+  const regen=hasMod('regen');
+  const slowBullets=mods.reduce((v,m)=>m.slowBullets?m.slowBullets:v,1);
+  const comboFever=hasMod('combo_fever');
+  const enemyFireMult=mods.reduce((v,m)=>m.enemyFireMult?m.enemyFireMult:v,1);
+  const mirrorMatch=hasMod('mirror_match');
+  const chaosWeapons=hasMod('random_weapons');
+
+  const baseHp=hasUnlock('hp_boost')?125:100;
+  const critBonus=hasUnlock('crit_boost')?0.08:0;
+  const maxEnergy=hasUnlock('energy_boost')?120:100;
+  const maxCombo=hasUnlock('combo_king')?40:20;
+
+  // Build player weapons
+  const pWeps=lobby.pWeapons.map(def=>{
+    const w={...def};
+    w.ammoLeft=isFinite(def.ammoMax)?def.ammoMax:Infinity;
+    if(infiniteAmmo) w.ammoLeft=Infinity;
+    w.lastShot=0;w.reloading=false;w.reloadEnd=0;w.spinLvl=0;w.burstQ=0;w.burstNext=0;
+    return w;
+  });
+  const eWeps=mirrorMatch?pWeps.map(w=>({...w,ammoLeft:isFinite(w.ammoMax)?w.ammoMax:Infinity})):lobby.eWeapons.map(def=>{
+    const w={...def};
+    w.ammoLeft=isFinite(def.ammoMax)?def.ammoMax:Infinity;
+    w.lastShot=0;w.reloading=false;w.reloadEnd=0;w.spinLvl=0;w.burstQ=0;w.burstNext=0;
+    w.rate=Math.floor(w.rate*enemyFireMult);
+    return w;
+  });
+
+  const pAbils=lobby.pAbils.map((def,i)=>({def,key:String(i+1),cd:0,active:false,activeEnd:0}));
+
+  // Generate map
+  const platforms=genPlatforms(lobby.theme);
+
+  GS={
+    lobby,diff,theme:lobby.theme,mods,
+    gravMult,speedMult,jumpMult,dmgMult,selfDmgMult,infiniteAmmo,lifeSteal,
+    fog,bigHead,oneHit,regen,slowBullets,comboFever,chaosWeapons,
+    score:0,wave:1,combo:0,comboTimer:0,maxCombo,
+    running:true,
+    bullets:[],particles:[],explosions:[],blackholes:[],decoys:[],fields:[],
+    mines:[],grenades:[],
+    timeSlow:false,timeSlowEnd:0,
+    bgParts:genBgParticles(lobby.theme),
+    shakeTimer:0,shakeAmt:0,
+    chaosTimer:0,
+    stats:{shots:0,hits:0,dmgDealt:0,dmgTaken:0,bestCombo:0,killTime:0,kills:0},
+    startTime:now(),
+
+    player:{
+      x:130,y:FLOOR_Y,w:20,h:30,
+      vx:0,vy:0,onGround:false,facing:1,
+      hp:baseHp,maxHp:baseHp,
+      energy:maxEnergy,maxEnergy,
+      weapons:pWeps,weapIdx:0,
+      abilities:pAbils,
+      statuses:[],
+      invincible:0,
+      dashing:false,dashTimer:0,dashVx:0,
+      wallSliding:false,wallDir:0,wallJumpCd:0,
+      doubleJumped:false,
+      hovering:false,
+      berserk:false,berserkEnd:0,
+      reflecting:false,reflectEnd:0,
+      shielded:false,shieldEnd:0,
+      invisible:false,invisEnd:0,
+      ironSkin:false,ironSkinEnd:0,
+      secondLife:pAbils.some(a=>a.def.id==='a_second_life'),secondLifeUsed:false,
+      thorns:pAbils.some(a=>a.def.id==='a_thorns'),
+      leechAura:pAbils.some(a=>a.def.id==='a_leech_aura'),
+      passiveDJ:pAbils.some(a=>a.def.id==='a_djump'),
+      passiveWS:pAbils.some(a=>a.def.id==='a_wallslide'),
+      passiveRegen:pAbils.some(a=>a.def.id==='a_regen'),
+      passiveMomentum:pAbils.some(a=>a.def.id==='a_momentum'),
+      momentumSpd:0,
+      rewindHistory:[],
+      critBonus,
+      mheld:false,
+      skin:PROG.unlocked.includes('skin_void')?'void':
+           PROG.unlocked.includes('skin_fire')?'fire':
+           PROG.unlocked.includes('skin_ghost')?'ghost':
+           PROG.unlocked.includes('skin_neon')?'neon':'default',
+    },
+
+    enemy:{
+      x:800,y:FLOOR_Y,w:20,h:30,
+      vx:0,vy:0,onGround:false,facing:-1,
+      hp:(150+wave*0)*diff.hpMult,maxHp:(150)*diff.hpMult,
+      weapons:eWeps,weapIdx:0,
+      statuses:[],invincible:0,
+      ai:{
+        state:'idle',stateT:0,stratT:diff.stratMs,
+        jumpCd:0,dodgeCd:0,aimOff:{x:0,y:0},aimT:0,flankDir:1,
+        abilCd:0,lastAbil:'',adaptLevel:0,
+      },
+      abilities:[],
+    },
+
+    keys:{},mouse:{x:480,y:270,down:false},
+    lastFrame:now(),
+  };
+
+  // HUD
+  buildAbilityBar(GS);
+  buildFogOverlay(GS);
+  document.getElementById('hud-mod').textContent=mods.map(m=>
+    `${m.icon} ${LANG==='tr'?m.nameTR:m.name}`).join(' | ');
+
+  // Input
+  document.onkeydown=e=>{
+    if(!GS.running)return;
+    GS.keys[e.code]=true;
+    // Weapon switch
+    if(e.code==='KeyQ') switchWeapon(GS.player);
+    if(e.code==='KeyR') startReload(GS.player.weapons[GS.player.weapIdx]);
+    // Abilities
+    for(let i=0;i<4;i++) if(e.code===`Digit${i+1}`) activateAbility(GS,i);
+    // Melee
+    if(e.code==='KeyX') quickMelee(GS);
+    e.preventDefault();
+  };
+  document.onkeyup=e=>{GS.keys[e.code]=false;};
+  gc.onmousemove=e=>{const r=gc.getBoundingClientRect();GS.mouse.x=e.clientX-r.left;GS.mouse.y=e.clientY-r.top;};
+  gc.onmousedown=e=>{GS.mouse.down=true;e.preventDefault();};
+  gc.onmouseup=()=>{GS.mouse.down=false;};
+
+  GS.lastFrame=now();
+  animId=requestAnimationFrame(gameLoop);
+}
+
+function genPlatforms(theme){
+  const F=FLOOR_Y+30;
+  const plats=[{x:0,y:F,w:CW,h:120,ground:true}];
+  // Balanced procedural layout: always has reachable platforms
+  const configs=[
+    [ri(80,150), ri(290,340), ri(120,165)],
+    [ri(290,380), ri(245,295), ri(115,155)],
+    [ri(530,620), ri(290,340), ri(120,160)],
+    [ri(740,820), ri(245,295), ri(110,150)],
+    [ri(195,290), ri(185,235), ri(100,145)],
+    [ri(440,530), ri(185,235), ri(95,140)],
+    [ri(680,780), ri(170,220), ri(100,145)],
+    [ri(50,130),  ri(170,220), ri(90,130)],
+    [ri(820,890), ri(290,340), ri(80,120)],
+  ];
+  configs.forEach(([px,py,pw])=>plats.push({x:px,y:py,w:pw,h:14}));
+  return plats;
+}
+
+function genBgParticles(theme){
+  const ps=[];
+  const count=50;
+  for(let i=0;i<count;i++) ps.push({
+    x:rnd(0,CW),y:rnd(0,CH),
+    vx:theme.rain?rnd(-.4,-.2):theme.dust?rnd(-.2,.2):0,
+    vy:theme.rain?rnd(1.5,3):theme.dust?rnd(-.1,.15):0,
+    size:theme.star?(Math.random()<.1?2:1):1.5,
+    a:rnd(.2,.8),
+    type:theme.rain?'rain':theme.dust?'dust':'star',
+  });
+  return ps;
+}
+
+// ── PHYSICS ──────────────────────────────────────────────────
+function physStep(e,gs,dt){
+  const sf=gs.timeSlow?0.2:1;
+  const frozen=hasStat(e,'freeze'),stunned=hasStat(e,'stun');
+  if(frozen||stunned){e.vx=0;return;}
+
+  const g=G_BASE*gs.gravMult;
+  e.vy+=g*sf*(dt/16);
+  e.x+=e.vx*sf*(dt/16);
+  e.y+=e.vy*sf*(dt/16);
+
+  e.onGround=false;
+  for(const p of gs.platforms){
+    if(e.x+e.w>p.x&&e.x<p.x+p.w){
+      if(e.y+e.h>=p.y&&e.y+e.h<=p.y+p.h+Math.abs(e.vy)+8&&e.vy>=0){
+        e.y=p.y-e.h; e.vy=0; e.onGround=true;
+        if(e===gs.player){e.doubleJumped=false;}
+      }
+    }
+  }
+  e.x=clmp(e.x,0,CW-e.w);
+  if(e.y>CH+100){e.y=FLOOR_Y;e.vy=0;}
+}
+
+// ── PLAYER UPDATE ────────────────────────────────────────────
+function updatePlayer(gs,dt){
+  const p=gs.player;
+  const sf=gs.timeSlow?.35:1;
+  const spd=5*gs.speedMult*sf;
+  const stunned=hasStat(p,'stun'),frozen=hasStat(p,'freeze');
+
+  // Momentum passive
+  if(p.passiveMomentum&&!stunned&&!frozen){
+    if(gs.keys['KeyA']||gs.keys['KeyD']||gs.keys['ArrowLeft']||gs.keys['ArrowRight'])
+      p.momentumSpd=Math.min(p.momentumSpd+0.04,2.5);
+    else p.momentumSpd=Math.max(p.momentumSpd-0.08,0);
+  }
+  const momBonus=p.momentumSpd||0;
+
+  // Dash
+  if(p.dashing&&p.dashTimer>0){
+    p.dashTimer-=dt; p.vx=p.dashVx;
+    if(p.dashTimer<=0){p.dashing=false;p.vx=0;}
+  } else if(!stunned&&!frozen){
+    if(gs.keys['KeyA']||gs.keys['ArrowLeft']){p.vx=-(spd+momBonus);p.facing=-1;}
+    else if(gs.keys['KeyD']||gs.keys['ArrowRight']){p.vx=spd+momBonus;p.facing=1;}
+    else p.vx=0;
+  }
+
+  // Wall slide detection
+  p.wallSliding=false;
+  if(!p.onGround&&p.vy>0&&p.passiveWS){
+    const lWall=gs.platforms.some(pl=>Math.abs(p.x-pl.x-pl.w)<4&&p.y+p.h>pl.y+4&&p.y<pl.y+pl.h-4);
+    const rWall=gs.platforms.some(pl=>Math.abs(p.x+p.w-pl.x)<4&&p.y+p.h>pl.y+4&&p.y<pl.y+pl.h-4);
+    if(lWall){p.wallSliding=true;p.wallDir=-1;p.vy=Math.min(p.vy,1.2);}
+    if(rWall){p.wallSliding=true;p.wallDir=1;p.vy=Math.min(p.vy,1.2);}
+  }
+
+  // Jump
+  const jumpPressed=gs.keys['Space']||gs.keys['KeyW']||gs.keys['ArrowUp'];
+  if(jumpPressed&&!p._jumpHeld){
+    if(p.onGround){
+      p.vy=-13*gs.jumpMult; p.doubleJumped=false;
+      burst(p.x+10,p.y+p.h,'rgba(68,136,255,0.3)',5,2);
+    } else if(p.wallSliding&&p.passiveWS){
+      p.vy=-12*gs.jumpMult; p.vx=-p.wallDir*8; p.wallSliding=false;
+      burst(p.x+10,p.y+14,'rgba(100,200,255,0.4)',5,2);
+    } else if(p.passiveDJ&&!p.doubleJumped){
+      p.vy=-11*gs.jumpMult; p.doubleJumped=true;
+      burst(p.x+10,p.y+14,'rgba(68,136,255,0.5)',8,3);
+    }
+  }
+  p._jumpHeld=jumpPressed;
+
+  physStep(p,gs,dt);
+  p.facing=gs.mouse.x>p.x+10?1:-1;
+
+  // Shooting
+  const w=p.weapons[p.weapIdx];
+  if(w.reloading&&now()>=w.reloadEnd){
+    w.reloading=false;w.ammoLeft=gs.infiniteAmmo?Infinity:w.ammoMax;
+    kf('⟳ RELOADED','info');
+  }
+  const stunShoot=hasStat(p,'stun')||hasStat(p,'freeze');
+  if(!w.reloading&&!stunShoot){
+    if(w.cat==='melee'){
+      if(gs.mouse.down&&!p.mheld) doMelee(gs,p,w,gs.enemy,false);
+    } else {
+      if(w.spinup) w.spinLvl=gs.mouse.down?Math.min(1,w.spinLvl+dt/w.spinup):Math.max(0,w.spinLvl-dt/400);
+      if(w.burstQ>0&&now()>=w.burstNext){
+        fireBullet(gs,p,w,gs.mouse.x,gs.mouse.y,'player'); w.burstQ--; w.burstNext=now()+(w.burstDelay||80);
+      }
+      if(gs.mouse.down&&(!w.auto?!p.mheld:true)){
+        if(!w.spinup||w.spinLvl>.85){
+          if(w.burst){if(w.burstQ===0){w.burstQ=w.burst;w.burstNext=now();}}
+          else fireBullet(gs,p,w,gs.mouse.x,gs.mouse.y,'player');
+        }
+      }
+    }
+  }
+  p.mheld=gs.mouse.down;
+
+  // Ability ticks
+  p.abilities.forEach(ab=>{
+    if(ab.cd>0)ab.cd=Math.max(0,ab.cd-dt);
+    if(ab.active&&now()>ab.activeEnd)ab.active=false;
+  });
+  // Berserk/shield/invis/reflect timeout
+  if(p.berserk&&now()>p.berserkEnd){p.berserk=false;kf('😡 BERSERK ENDED');}
+  if(p.shielded&&now()>p.shieldEnd)p.shielded=false;
+  if(p.reflecting&&now()>p.reflectEnd)p.reflecting=false;
+  if(p.invisible&&now()>p.invisEnd)p.invisible=false;
+  if(p.ironSkin&&now()>p.ironSkinEnd)p.ironSkin=false;
+
+  // Passive regen
+  if(p.passiveRegen||gs.regen) p.hp=Math.min(p.maxHp,p.hp+0.008*(dt/16));
+  // Energy regen
+  p.energy=Math.min(p.maxEnergy,p.energy+0.045*(dt/16));
+  // Status tick
+  tickStatuses(p,gs,dt,false);
+  if(p.invincible>0) p.invincible-=dt;
+
+  // Time slow
+  if(gs.timeSlow&&now()>gs.timeSlowEnd){
+    gs.timeSlow=false;
+    document.getElementById('ovl-slow').style.opacity=0;
+    kf('⬡ TIME RESTORED');
+  }
+
+  // Rewind history
+  if(now()%100<dt) p.rewindHistory.push({x:p.x,y:p.y,hp:p.hp});
+  if(p.rewindHistory.length>40) p.rewindHistory.shift();
+
+  // Chaos weapons swap
+  if(gs.chaosWeapons){
+    gs.chaosTimer=(gs.chaosTimer||0)+dt;
+    if(gs.chaosTimer>=10000){
+      gs.chaosTimer=0;
+      const nw=weightedPickWeapon();
+      const wp={...nw,ammoLeft:isFinite(nw.ammoMax)?nw.ammoMax:Infinity,lastShot:0,reloading:false,reloadEnd:0,spinLvl:0,burstQ:0,burstNext:0};
+      gs.player.weapons[gs.player.weapIdx]=wp;
+      kf(`🎲 WEAPON SWAP: ${wp.name}`,'legendary');
+    }
+  }
+}
+
+// ── ENEMY AI ─────────────────────────────────────────────────
+function updateEnemy(gs,dt){
+  const e=gs.enemy,p=gs.player,ai=e.ai,diff=gs.diff;
+  if(e.hp<=0)return;
+  const sf=gs.timeSlow?.15:1;
+
+  ai.stratT-=dt*sf; ai.jumpCd-=dt; ai.dodgeCd-=dt;
+  ai.aimT-=dt; ai.abilCd-=dt;
+  e.invincible-=dt;
+
+  tickStatuses(e,gs,dt,true);
+  if(hasStat(e,'stun')||hasStat(e,'freeze')){e.vx=0;physStep(e,gs,dt);return;}
+
+  const pdx=(p.x+10)-(e.x+10);
+  const pdist=Math.abs(pdx);
+  e.facing=pdx>0?1:-1;
+
+  // Adaptive AI: learn from player behavior
+  if(diff===DIFF.extreme||diff===DIFF.hard){
+    if(p.invisible) ai.adaptLevel=Math.max(0,ai.adaptLevel-.01*dt);
+    else ai.adaptLevel=Math.min(1,ai.adaptLevel+.001*dt);
+  }
+
+  // Strategy update
+  if(ai.stratT<=0){
+    ai.stratT=diff.stratMs*(0.7+Math.random()*.6);
+    const r=Math.random();
+    // EXTREME: predict and counter
+    if(diff===DIFF.extreme){
+      if(pdist>240)ai.state=r<.7?'chase':'flank';
+      else if(pdist<diff.retreatD&&r<.6)ai.state='retreat';
+      else if(r<diff.aggr)ai.state='aggressive';
+      else ai.state='strafe';
+    } else if(diff===DIFF.hard){
+      if(pdist>220)ai.state='chase';
+      else if(pdist<diff.retreatD&&r<.5)ai.state='retreat';
+      else ai.state=r<diff.aggr?'aggressive':'strafe';
+    } else if(diff===DIFF.normal){
+      ai.state=pdist>200?'chase':r<diff.aggr?'strafe':'idle';
+    } else {
+      ai.state=r<.4?'chase':'idle';
+    }
+  }
+
+  // Movement
+  const spd=3.6*gs.speedMult*sf;
+  switch(ai.state){
+    case 'chase':      e.vx=e.facing*spd;break;
+    case 'aggressive': e.vx=e.facing*spd*1.25;break;
+    case 'retreat':    e.vx=-e.facing*spd*.85;break;
+    case 'strafe':     e.vx=Math.sin(now()*.003)*spd*(1+Math.random()*.3);break;
+    case 'flank':      e.vx=e.facing*spd*ai.flankDir*(0.7+Math.sin(now()*.005)*.3);break;
+    default:           e.vx=0;
+  }
+
+  // Dodge bullets
+  if(ai.dodgeCd<=0&&Math.random()<diff.dodge){
+    const nearBullet=gs.bullets.find(b=>b.owner==='player'&&Math.abs(b.x-e.x)<180&&Math.abs(b.y-e.y)<80);
+    if(nearBullet){e.vx+=(nearBullet.y>e.y?-1:1)*8*sf;ai.dodgeCd=700+Math.random()*400;}
+  }
+
+  // Jump
+  if(e.onGround&&ai.jumpCd<=0){
+    const shouldJump=
+      (p.y<e.y-60&&pdist<250&&Math.random()<.04)||
+      (Math.random()<.005);
+    if(shouldJump){e.vy=-12;ai.jumpCd=1500+Math.random()*1200;}
+  }
+
+  physStep(e,gs,dt);
+
+  // Weapon switching (HARD+)
+  if(diff===DIFF.hard||diff===DIFF.extreme){
+    const cw=e.weapons[e.weapIdx];
+    if(cw.cat==='melee'&&pdist>cw.range+20) e.weapIdx=(e.weapIdx+1)%e.weapons.length;
+    if(cw.cat!=='melee'&&pdist<cw.range) {
+      const mi=e.weapons.findIndex(w=>w.cat==='melee');
+      if(mi>=0)e.weapIdx=mi;
+    }
+  }
+
+  // Aim update
+  if(ai.aimT<=0){
+    ai.aimT=diff.react*(0.7+Math.random()*.6);
+    const err=diff.aimErr*(1-ai.adaptLevel*.3);
+    ai.aimOff={x:(Math.random()-.5)*err*2,y:(Math.random()-.5)*err*2};
+    if(diff===DIFF.extreme){ai.aimOff.x+=p.vx*12;ai.aimOff.y+=p.vy*5;}
+  }
+
+  // Shoot
+  const ew=e.weapons[e.weapIdx];
+  if(ew.reloading&&now()>=ew.reloadEnd){ew.reloading=false;ew.ammoLeft=gs.infiniteAmmo?Infinity:ew.ammoMax;}
+  if(!ew.reloading&&(ew.ammoLeft>0||!isFinite(ew.ammoLeft))){
+    if(ew.cat==='melee'){
+      if(pdist<(ew.range||40)+12) doMelee(gs,e,ew,p,true);
+    } else {
+      const tx=p.x+10+ai.aimOff.x,ty=p.y+15+ai.aimOff.y;
+      if(p.invisible&&Math.random()>.3){}else fireBullet(gs,e,ew,tx,ty,'enemy');
+    }
+  }
+  if(!ew.reloading&&isFinite(ew.ammoLeft)&&ew.ammoLeft===0){
+    ew.reloading=true;ew.reloadEnd=now()+ew.reload;
+  }
+}
+
+// ── BULLET SYSTEM ────────────────────────────────────────────
+function fireBullet(gs,shooter,w,tx,ty,owner){
+  const n=now();
+  const slowFire=gs.timeSlow?(owner==='player'?1:.2):1;
+  if(n-w.lastShot<w.rate/slowFire)return;
+  if(isFinite(w.ammoLeft)&&w.ammoLeft<=0)return;
+  w.lastShot=n;
+  if(isFinite(w.ammoLeft))w.ammoLeft--;
+  if(gs.stats&&owner==='player')gs.stats.shots++;
+
+  const cx=shooter.x+10,cy=shooter.y+15;
+  let dx=tx-cx,dy=ty-cy;
+  const len=Math.sqrt(dx*dx+dy*dy)||1;
+  dx/=len;dy/=len;
+
+  const bMult=(owner==='player'&&gs.player.berserk)?2:1;
+  const dMult=owner==='player'?gs.dmgMult:1;
+
+  // Fan spread
+  const fanCount=w.fan||1;
+  const angles=[];
+  if(fanCount>1){
+    for(let i=0;i<fanCount;i++) angles.push(Math.atan2(dy,dx)+(i-(fanCount-1)/2)*(w.spread*2+.15));
+  } else {
+    for(let i=0;i<(w.pellets||1);i++) angles.push(Math.atan2(dy,dx)+(Math.random()-.5)*w.spread*2);
+  }
+
+  for(const angle of angles){
+    const sp=w.speed*(gs.slowBullets||1)*(0.9+Math.random()*.1);
+    const dmg=calcDmg(w,owner,gs)*bMult*dMult;
+
+    if(w.laser){processLaser(gs,cx,cy,dx,dy,dmg,w,owner);continue;}
+
+    const b={
+      x:cx,y:cy,
+      vx:Math.cos(angle)*sp,
+      vy:Math.sin(angle)*sp,
+      dmg,crit:false,
+      color:w.color||'#ffff44',
+      owner,
+      effect:w.effect||null,
+      pierce:w.pierce||false,
+      bouncy:w.bouncy||0,
+      explosive:w.explosive||false,explodeR:w.explodeR||80,
+      blackhole:w.blackhole||false,
+      gravB:w.gravity||0,
+      shortRange:w.short||false,
+      trail:[],
+      life:w.short?20:100,
+      type:'bullet',
+    };
+    // Black hole
+    if(w.blackhole){gs.blackholes.push({x:cx,y:cy,vx:b.vx,vy:b.vy,r:0,maxR:90,life:140,owner});continue;}
+    // Grenade bounce
+    if(w.bounce){b.type='grenade';b.bounces=0;b.timer=2000;b.explodeR=w.explodeR||80;}
+
+    gs.bullets.push(b);
+  }
+  // Recoil
+  burst(cx,cy,w.color||'#ffff44',3,1.5);
+}
+
+function processLaser(gs,ox,oy,dx,dy,dmg,w,owner){
+  // Hitscan: check collision along ray
+  const target=owner==='player'?gs.enemy:gs.player;
+  for(let t=0;t<100;t+=4){
+    const x=ox+dx*t,y=oy+dy*t;
+    if(x>target.x&&x<target.x+target.w&&y>target.y&&y<target.y+target.h){
+      if(owner==='player'&&gs.enemy.invincible<=0){
+        const final=dmgEnemy(gs,dmg);
+        spawnDmgNum(gs,target.x+10,target.y,final.dmg,w.color,final.crit);
+      } else if(owner==='enemy'&&gs.player.invincible<=0&&!gs.player.shielded){
+        dmgPlayer(gs,dmg);
+      }
+      break;
+    }
+    // Laser trail particles
+    if(t%16<4) gs.particles.push({x,y,vx:0,vy:0,life:4,maxLife:4,color:w.color,size:2});
+  }
+}
+
+function calcDmg(w,owner,gs){
+  const base=rnd(w.dmg[0],w.dmg[1]);
+  const critBase=0.1+(gs.player&&owner==='player'?gs.player.critBonus:0);
+  const bigHeadBonus=gs.bigHead?.2:0;
+  const isCrit=Math.random()<(critBase+bigHeadBonus+(w.crit||0));
+  return Math.round(base*(isCrit?rnd(2,3):1));
+}
+
+function updateBullets(gs,dt){
+  const sf=gs.timeSlow?.22:1;
+
+  // Blackholes
+  gs.blackholes=gs.blackholes.filter(bh=>{
+    bh.x+=bh.vx*sf*(dt/16);bh.y+=bh.vy*sf*(dt/16);
+    bh.vy+=G_BASE*gs.gravMult*sf*(dt/16);
+    bh.r=Math.min(bh.maxR,bh.r+2);bh.life-=sf*(dt/16);
+    [gs.player,gs.enemy].forEach(e=>{
+      const ddx=bh.x-(e.x+10),ddy=bh.y-(e.y+15),dl=Math.sqrt(ddx*ddx+ddy*ddy)||1;
+      if(dl<bh.r+40){e.vx+=ddx/dl*2.5;e.vy+=ddy/dl*2;}
+    });
+    return bh.life>0;
+  });
+
+  // Decoys
+  gs.decoys=gs.decoys.filter(d=>now()<d.end);
+
+  for(let i=gs.bullets.length-1;i>=0;i--){
+    const b=gs.bullets[i];
+    if(b.type==='grenade'){updateGrenade(gs,b,i,sf,dt);continue;}
+
+    b.trail.push({x:b.x,y:b.y});
+    if(b.trail.length>10)b.trail.shift();
+
+    if(b.gravB) b.vy+=b.gravB*sf;
+    else b.vy+=.08*sf*(dt/16);
+    b.x+=b.vx*sf*(dt/16);
+    b.y+=b.vy*sf*(dt/16);
+    b.life-=sf*(dt/16);
+
+    if(b.life<=0||b.x<-20||b.x>CW+20||b.y>CH+30){gs.bullets.splice(i,1);continue;}
+
+    // Wall bounce
+    if(b.bouncy>0){
+      if(b.x<2||b.x>CW-2){b.vx*=-1;b.bouncy--;}
+    }
+
+    // Platform collision
+    let hitPlat=false;
+    for(const pl of gs.platforms){
+      if(b.x>pl.x&&b.x<pl.x+pl.w&&b.y>pl.y&&b.y<pl.y+pl.h){
+        if(b.explosive){doExplosion(gs,b.x,b.y,b.explodeR,b.dmg,b.owner==='player'?'enemy':'player');gs.bullets.splice(i,1);hitPlat=true;break;}
+        if(b.bouncy>0){b.vy*=-1;b.bouncy--;continue;}
+        burst(b.x,b.y,b.color,3,1);gs.bullets.splice(i,1);hitPlat=true;break;
+      }
+    }
+    if(hitPlat)continue;
+
+    // Hit player
+    if(b.owner==='enemy'){
+      if(gs.player.reflecting&&rectHit(b,gs.player,14)){
+        b.owner='player';b.vx*=-1.1;b.vy*=-.3;
+        kf('🪞 REFLECTED!','good');continue;
+      }
+      if(gs.player.shielded&&rectHit(b,gs.player,14)){
+        burst(b.x,b.y,'#44ccff',5);gs.bullets.splice(i,1);continue;
+      }
+      if(gs.player.invincible<=0&&rectHit(b,gs.player,0)){
+        const dmg=b.dmg*gs.selfDmgMult;
+        dmgPlayer(gs,dmg);
+        if(b.effect)applyStat(gs.player,b.effect,2200);
+        if(gs.player.thorns){
+          const td=Math.round(dmg*.2);
+          dmgEnemy(gs,td);kf(`🌵 THORNS ${td}dmg`,'info');
+        }
+        if(b.explosive){doExplosion(gs,b.x,b.y,b.explodeR,b.dmg,'player');}
+        if(!b.pierce){gs.bullets.splice(i,1);continue;}
+      }
+    }
+
+    // Hit enemy
+    if(b.owner==='player'&&gs.enemy.hp>0&&gs.enemy.invincible<=0){
+      if(rectHit(b,gs.enemy,0)){
+        const result=dmgEnemy(gs,b.dmg);
+        gs.stats.hits++;
+        spawnDmgNum(gs,gs.enemy.x+10,gs.enemy.y,result.dmg,b.color,result.crit);
+        if(b.effect)applyStat(gs.enemy,b.effect,2200);
+        if(gs.player.leechAura){gs.player.hp=Math.min(gs.player.maxHp,gs.player.hp+result.dmg*.08);burst(gs.player.x+10,gs.player.y+15,'#ff44aa',3,1.5);}
+        if(gs.lifeSteal){gs.player.hp=Math.min(gs.player.maxHp,gs.player.hp+result.dmg*gs.lifeSteal);burst(gs.player.x+10,gs.player.y+15,'#ff44aa',3,1.5);}
+        if(b.explosive){doExplosion(gs,b.x,b.y,b.explodeR,b.dmg,'enemy');}
+        if(!b.pierce){gs.bullets.splice(i,1);continue;}
+      }
+    }
+  }
+}
+
+function updateGrenade(gs,b,i,sf,dt){
+  b.x+=b.vx*sf*(dt/16);b.y+=b.vy*sf*(dt/16);
+  b.vy+=G_BASE*gs.gravMult*sf*(dt/16);
+  b.timer-=dt*sf;
+  for(const pl of gs.platforms){
+    if(b.x>pl.x&&b.x<pl.x+pl.w&&b.y+7>pl.y&&b.y+7<pl.y+pl.h+4&&b.vy>0){
+      b.vy*=-.55;b.vx*=.7;b.bounces++;
+    }
+  }
+  if(b.x<4||b.x>CW-4)b.vx*=-1;
+  if(b.timer<=0){doExplosion(gs,b.x,b.y,b.explodeR||80,[80,115],'player');gs.bullets.splice(i,1);}
+}
+
+function rectHit(b,e,pad){
+  return b.x>e.x-pad&&b.x<e.x+e.w+pad&&b.y>e.y-pad&&b.y<e.y+e.h+pad;
+}
+
+function doExplosion(gs,x,y,radius,dmg,hurtWho){
+  gs.explosions.push({x,y,r:0,maxR:radius,life:30});
+  burst(x,y,'#ff8822',20,7);
+  shake(gs,6,200);
+  const targets=hurtWho==='player'?[gs.player]:[gs.enemy];
+  targets.forEach(tgt=>{
+    const d2=Math.sqrt((tgt.x+10-x)**2+(tgt.y+15-y)**2);
+    if(d2<radius+25){
+      const frac=1-clmp(d2/radius,0,1);
+      const dmgVal=typeof dmg==='number'?Math.round(dmg*frac):Math.round(rnd(dmg[0],dmg[1])*frac);
+      if(dmgVal>0){
+        if(hurtWho==='player')dmgPlayer(gs,dmgVal*gs.selfDmgMult);
+        else{const r2=dmgEnemy(gs,dmgVal);spawnDmgNum(gs,tgt.x+10,tgt.y,r2.dmg,'#ff8800',false);}
+      }
+    }
+  });
+}
+
+// ── DAMAGE ───────────────────────────────────────────────────
+function dmgPlayer(gs,raw){
+  const p=gs.player;
+  if(p.invincible>0)return;
+  let dmg=raw;
+  if(p.ironSkin)dmg*=.5;
+  p.hp=Math.max(0,p.hp-dmg);
+  gs.stats.dmgTaken+=dmg;
+  p.invincible=320;
+  gs.combo=0;gs.comboTimer=0;
+  document.getElementById('ovl-dmg').style.background='rgba(255,0,0,.32)';
+  setTimeout(()=>document.getElementById('ovl-dmg').style.background='rgba(255,0,0,0)',140);
+  shake(gs,5,180);
+  if(p.hp<=0){
+    if(p.secondLife&&!p.secondLifeUsed){
+      p.secondLifeUsed=true;p.hp=40;p.invincible=2000;
+      kf('💫 SECOND LIFE!','legendary');burst(p.x+10,p.y+15,'#ffdd00',20,6);
+    } else {
+      gs.running=false;PROG.totalMatches++;PROG.totalShots+=gs.stats.shots;PROG.totalHits+=gs.stats.hits;
+      PROG.totalDmg+=gs.stats.dmgDealt;
+      setTimeout(()=>endGame(gs,false),600);
+    }
+  }
+}
+
+function dmgEnemy(gs,rawDmg){
+  const e=gs.enemy;
+  if(e.invincible>0)return{dmg:0,crit:false};
+  const isCrit=rawDmg>Math.round(rnd(gs.enemy.weapons[0]?.dmg[0]||1,gs.enemy.weapons[0]?.dmg[1]||1)*2.5);
+  const final=gs.oneHit&&isCrit?9999:rawDmg;
+  e.hp=Math.max(0,e.hp-final);
+  e.invincible=200;
+  gs.stats.dmgDealt+=final;
+  gs.stats.hits=(gs.stats.hits||0)+1;
+  // Combo
+  gs.combo++;gs.comboTimer=3200;
+  if(gs.combo>gs.stats.bestCombo)gs.stats.bestCombo=gs.combo;
+  gs.score+=final*10*Math.max(1,gs.combo);
+  if(e.hp<=0&&gs.running){
+    gs.running=false;
+    gs.stats.kills++;PROG.totalKills++;PROG.totalMatches++;
+    gs.score+=1000*gs.wave;PROG.totalWaves+=gs.wave;
+    gs.stats.killTime=(now()-gs.startTime)/1000;
+    PROG.totalShots+=gs.stats.shots;PROG.totalHits+=gs.stats.hits;PROG.totalDmg+=gs.stats.dmgDealt;
+    burst(e.x+10,e.y+15,'#ff4444',35,9);shake(gs,10,400);
+    kf(`💀 ENEMY ELIMINATED! +${1000*gs.wave}`,'legendary');
+    setTimeout(()=>endGame(gs,true),1200);
+  }
+  return{dmg:final,crit:isCrit};
+}
+
+// ── MELEE ────────────────────────────────────────────────────
+function doMelee(gs,attacker,w,victim,isEnemy){
+  const n=now();
+  if(n-w.lastShot<w.rate)return;
+  w.lastShot=n;
+  const dist2=Math.sqrt((attacker.x-victim.x)**2+(attacker.y-victim.y)**2);
+  if(dist2>w.range+15)return;
+  const dmg=calcDmg(w,isEnemy?'enemy':'player',gs);
+  const bMult=(!isEnemy&&gs.player.berserk)?2:1;
+  const final=Math.round(dmg*bMult);
+  if(isEnemy){dmgPlayer(gs,final*gs.diff.dmgMult);}
+  else{const r=dmgEnemy(gs,final);spawnDmgNum(gs,victim.x+10,victim.y,r.dmg,w.color,r.crit);if(gs.lifeSteal)gs.player.hp=Math.min(gs.player.maxHp,gs.player.hp+final*gs.lifeSteal);}
+  burst(victim.x+10,victim.y+15,w.color,10,4);
+  if(w.effect)applyStat(victim,w.effect,2400);
+}
+
+function quickMelee(gs){
+  const p=gs.player,e=gs.enemy;
+  const dist2=Math.sqrt((p.x-e.x)**2+(p.y-e.y)**2);
+  if(dist2>55)return;
+  const dmg=ri(12,20)*gs.dmgMult;
+  const r=dmgEnemy(gs,dmg);
+  spawnDmgNum(gs,e.x+10,e.y,r.dmg,'#ffaa88',false);
+  burst(p.x+p.facing*40+10,p.y+15,'#ffaa88',6,3);
+}
+
+function switchWeapon(p){p.weapIdx=(p.weapIdx+1)%p.weapons.length;}
+function startReload(w){if(!w.reloading&&isFinite(w.ammoMax)&&w.ammoLeft<w.ammoMax){w.reloading=true;w.reloadEnd=now()+w.reload;}}
+
+// ── STATUS EFFECTS ───────────────────────────────────────────
+function applyStat(entity,type,dur){
+  const ex=entity.statuses.find(s=>s.type===type);
+  if(ex){ex.end=now()+dur;return;}
+  entity.statuses.push({type,end:now()+dur});
+}
+function hasStat(entity,type){return entity.statuses.some(s=>s.type===type&&s.end>now());}
+function tickStatuses(entity,gs,dt,isEnemy){
+  const n=now();
+  entity.statuses=entity.statuses.filter(s=>s.end>n);
+  for(const s of entity.statuses){
+    if(s.type==='burn'||s.type==='poison'){
+      if(!s.lastTick||n-s.lastTick>500){
+        s.lastTick=n;
+        const dmg=ri(s.type==='burn'?4:3,s.type==='burn'?9:7);
+        if(isEnemy){const r=dmgEnemy(gs,dmg);spawnDmgNum(gs,entity.x+10,entity.y,r.dmg,s.type==='burn'?'#ff6600':'#44ff44',false);}
+        else dmgPlayer(gs,dmg);
+        burst(entity.x+10,entity.y+15,s.type==='burn'?'#ff6600':'#44ff44',2,1.5);
+      }
+    }
+  }
+}
+
+// ── ABILITIES ────────────────────────────────────────────────
+function activateAbility(gs,idx){
+  const ab=gs.player.abilities[idx];
+  if(!ab)return;
+  if(ab.cd>0||gs.player.energy<ab.def.ec)return;
+  gs.player.energy-=ab.def.ec;
+  ab.cd=ab.def.cd;
+  const def=ab.def;
+
+  switch(def.id){
+    case 'a_dash':
+      gs.player.dashing=true;gs.player.dashTimer=def.dur||160;
+      gs.player.dashVx=gs.player.facing*15*gs.speedMult;
+      burst(gs.player.x+10,gs.player.y+15,'#4488ff',8,3);break;
+    case 'a_blink':
+      gs.player.x=clmp(gs.mouse.x-10,0,CW-20);
+      gs.player.y=clmp(gs.mouse.y-15,0,CH-30);
+      gs.player.vy=0;
+      burst(gs.player.x+10,gs.player.y+15,'#aa44ff',16,5);kf('🌀 BLINK','info');break;
+    case 'a_timeslow':case 'a_bullet_time':
+      gs.timeSlow=true;gs.timeSlowEnd=now()+(def.dur||5000);
+      document.getElementById('ovl-slow').style.opacity=1;kf('⏳ TIME SLOW','info');break;
+    case 'a_shield':
+      gs.player.shielded=true;gs.player.shieldEnd=now()+(def.dur||2500);
+      ab.active=true;ab.activeEnd=now()+(def.dur||2500);kf('🛡 SHIELD','info');break;
+    case 'a_berserk':
+      gs.player.berserk=true;gs.player.berserkEnd=now()+(def.dur||4000);
+      burst(gs.player.x+10,gs.player.y+15,'#ff2200',22,6);kf('😡 BERSERK!','legendary');break;
+    case 'a_invis':
+      gs.player.invisible=true;gs.player.invisEnd=now()+(def.dur||4000);
+      ab.active=true;ab.activeEnd=now()+(def.dur||4000);
+      document.getElementById('ovl-invis').style.opacity=.6;
+      setTimeout(()=>document.getElementById('ovl-invis').style.opacity=0,def.dur||4000);
+      kf('👁 INVISIBLE','info');break;
+    case 'a_heal':
+      gs.player.hp=Math.min(gs.player.maxHp,gs.player.hp+40);
+      burst(gs.player.x+10,gs.player.y+15,'#40ff80',12,3);kf('💊 HEALED +40','good');break;
+    case 'a_grenade':throwPlayerGrenade(gs);break;
+    case 'a_mirror':case 'a_counter':
+      gs.player.reflecting=true;gs.player.reflectEnd=now()+(def.dur||1500);
+      ab.active=true;ab.activeEnd=now()+(def.dur||1500);kf('🪞 REFLECTING','info');break;
+    case 'a_emp':
+      applyStat(gs.enemy,'stun',2000);burst(gs.enemy.x+10,gs.enemy.y+15,'#ffff00',16,5);kf('⚡ EMP STUN!','good');break;
+    case 'a_napalm':case 'a_airstrike':doAirstrike(gs);break;
+    case 'a_summon':case 'a_clone':
+      gs.decoys.push({x:gs.player.x,y:gs.player.y,end:now()+(def.dur||4000)});kf('👤 DECOY','info');break;
+    case 'a_phase':
+      gs.player.invincible=(def.dur||1200);ab.active=true;ab.activeEnd=now()+(def.dur||1200);kf('👻 PHASE SHIFT','info');break;
+    case 'a_speed':case 'a_sprint':
+      gs.player.momentumSpd=3;setTimeout(()=>gs.player.momentumSpd=0,def.dur||3000);kf('⚡ OVERDRIVE','info');break;
+    case 'a_armor':case 'a_fortress':
+      gs.player.ironSkin=true;gs.player.ironSkinEnd=now()+(def.dur||5000);
+      ab.active=true;ab.activeEnd=now()+(def.dur||5000);kf('🦾 IRON SKIN','info');break;
+    case 'a_execute':
+      if(gs.enemy.hp<gs.enemy.maxHp*.2){dmgEnemy(gs,99999);kf('⚔️ EXECUTE!','legendary');}break;
+    case 'a_cdr':
+      gs.player.abilities.forEach(a=>{if(a.cd>0)a.cd=0;});kf('⏩ COOLDOWN RESET!','legendary');break;
+    case 'a_crits':
+      gs.player.critBonus+=.9;setTimeout(()=>gs.player.critBonus-=.9,(def.dur||4000));kf('🦅 EAGLE EYE','info');break;
+    case 'a_vortex':
+      {const ddx=gs.player.x-(gs.enemy.x+10),ddy=gs.player.y-(gs.enemy.y+15);
+      const dl=Math.sqrt(ddx*ddx+ddy*ddy)||1;
+      gs.enemy.vx=ddx/dl*20;gs.enemy.vy=ddy/dl*10;kf('🌪️ VORTEX','good');}break;
+    case 'a_swap':
+      {const px2=gs.player.x,py2=gs.player.y;
+      gs.player.x=gs.enemy.x;gs.player.y=gs.enemy.y;
+      gs.enemy.x=px2;gs.enemy.y=py2;kf('🔃 POSITION SWAP','legendary');}break;
+    case 'a_phoenix':
+      gs.player.hp=gs.player.maxHp;burst(gs.player.x+10,gs.player.y+15,'#ff8800',25,7);kf('🦅 PHOENIX!','legendary');break;
+    case 'a_immortal':
+      gs.player.invincible=def.dur||2000;ab.active=true;ab.activeEnd=now()+(def.dur||2000);kf('♾️ IMMORTAL','legendary');break;
+    case 'a_rewind':
+      if(gs.player.rewindHistory.length>0){
+        const snap=gs.player.rewindHistory[0];
+        gs.player.x=snap.x;gs.player.y=snap.y;gs.player.hp=Math.max(1,snap.hp);
+        gs.player.rewindHistory=[];burst(gs.player.x+10,gs.player.y+15,'#8888ff',14,4);kf('⏪ REWOUND','info');}break;
+    case 'a_nuke':doNuke(gs);break;
+    case 'a_omega':
+      {const dmgO=ri(2000,4000);const r=dmgEnemy(gs,dmgO);spawnDmgNum(gs,gs.enemy.x+10,gs.enemy.y,r.dmg,'#ff00ff',true);burst(gs.enemy.x+10,gs.enemy.y+15,'#ff00ff',30,8);kf('Ω OMEGA STRIKE!','legendary');}break;
+    case 'a_gravity_shift':
+      gs.gravMult=gs.gravMult<.5?1:.45;setTimeout(()=>gs.gravMult=gs.lobby.mods.reduce((v,m)=>m.gravMult?m.gravMult:v,1),def.dur||5000);kf('🌍 GRAVITY SHIFT','info');break;
+    case 'a_ammo_drop':
+      gs.player.weapons.forEach(w=>{if(isFinite(w.ammoMax))w.ammoLeft=w.ammoMax;});kf('📦 AMMO REFILL','good');break;
+    case 'a_quantum':
+      gs.player.x=rnd(50,CW-70);gs.player.y=rnd(CH*.3,FLOOR_Y-30);gs.player.vy=0;
+      burst(gs.player.x+10,gs.player.y+15,'#44ffcc',12,4);kf('⚛️ QUANTUM LEAP','info');break;
+    case 'a_supply_drop':
+      {const nw=weightedPickWeapon();const wp={...nw,ammoLeft:isFinite(nw.ammoMax)?nw.ammoMax:Infinity,lastShot:0,reloading:false,reloadEnd:0,spinLvl:0,burstQ:0,burstNext:0};
+      gs.player.weapons[0]=wp;kf(`📦 SUPPLY: ${wp.name}`,'legendary');}break;
+    default:kf(`${def.icon} ${LANG==='tr'?def.nameTR:def.name}`,'info');
+  }
+}
+
+function throwPlayerGrenade(gs){
+  const p=gs.player;
+  const dx=gs.mouse.x-p.x-10,dy=gs.mouse.y-p.y-15;
+  const len=Math.sqrt(dx*dx+dy*dy)||1;
+  gs.bullets.push({x:p.x+10,y:p.y,vx:dx/len*9,vy:-8,owner:'player',type:'grenade',timer:2000,bounces:0,dmg:[80,115],explodeR:85,color:'#88ff44'});
+}
+
+function doAirstrike(gs){
+  kf('✈️ AIRSTRIKE!','legendary');
+  for(let i=0;i<7;i++){
+    setTimeout(()=>{
+      if(!gs.running)return;
+      const tx=rnd(60,CW-60);
+      gs.explosions.push({x:tx,y:0,r:0,maxR:110,life:28});
+      const near=Math.abs(tx-(gs.enemy.x+10))<100;
+      if(near){const r=dmgEnemy(gs,ri(80,130));spawnDmgNum(gs,tx,gs.enemy.y,r.dmg,'#ff6600',false);}
+      burst(tx,CH*.35,'#ff8800',22,8);shake(gs,6,200);
+    },i*280);
+  }
+}
+
+function doNuke(gs){
+  kf('☢️ TACTICAL NUKE!','legendary');
+  shake(gs,15,1000);
+  document.getElementById('ovl-dmg').style.background='rgba(255,255,200,.5)';
+  setTimeout(()=>document.getElementById('ovl-dmg').style.background='rgba(255,0,0,0)',500);
+  gs.explosions.push({x:CW/2,y:CH/2,r:0,maxR:CW,life:60});
+  setTimeout(()=>{if(gs.running){const r=dmgEnemy(gs,ri(300,600));spawnDmgNum(gs,gs.enemy.x+10,gs.enemy.y,r.dmg,'#ff8800',true);}},300);
+}
+
+// ── PARTICLES ────────────────────────────────────────────────
+function burst(x,y,color,count,spd=4){
+  if(!GS)return;
+  for(let i=0;i<count;i++){
+    const a=Math.random()*Math.PI*2,s=(0.5+Math.random())*spd;
+    GS.particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-.5,life:20+Math.random()*22,maxLife:42,color,size:1.5+Math.random()*2.5});
+  }
+}
+function spawnDmgNum(gs,x,y,val,color,crit){
+  gs.particles.push({type:'dmgnum',x,y,val,color:crit?'#ffffff':color,life:55,vy:-1.6,crit});
+}
+function shake(gs,amt,dur){
+  if(!PROG.settings.shake)return;
+  gs.shakeAmt=Math.max(gs.shakeAmt,amt);gs.shakeTimer=Math.max(gs.shakeTimer,dur);
+}
+
+function updateParticles(gs,dt){
+  const sf=gs.timeSlow?.22:1;
+  gs.particles=gs.particles.filter(p=>{
+    if(p.type==='dmgnum'){p.y+=p.vy;p.life--;return p.life>0;}
+    p.x+=p.vx*sf*(dt/16);p.y+=p.vy*sf*(dt/16);
+    p.vy+=.12*sf;p.life-=sf*(dt/16);return p.life>0;
+  });
+  gs.explosions=gs.explosions.filter(e=>{e.r+=(e.maxR-e.r)*.2;e.life--;return e.life>0;});
+  if(gs.shakeTimer>0){gs.shakeTimer-=dt;}else gs.shakeAmt=Math.max(0,gs.shakeAmt-1);
+}
+
+// ── DRAWING ──────────────────────────────────────────────────
+function drawFrame(gs){
+  const sx=gs.shakeAmt>0?rnd(-gs.shakeAmt,gs.shakeAmt)*PROG.settings.shake:0;
+  const sy=gs.shakeAmt>0?rnd(-gs.shakeAmt,gs.shakeAmt)*PROG.settings.shake:0;
+  ctx.save();ctx.translate(sx,sy);
+
+  ctx.clearRect(-10,-10,CW+20,CH+20);
+  drawBG(gs);
+  drawFields(gs);
+  drawBullets(gs);
+  drawBlackholes(gs);
+  drawDecoys(gs);
+  drawEntity(gs,gs.player,true);
+  if(gs.enemy.hp>0)drawEntity(gs,gs.enemy,false);
+  drawParticles(gs);
+  drawExplosions(gs);
+  drawDmgNums(gs);
+  drawReloadBar(gs);
+  if(gs.timeSlow)drawTimeslowOverlay();
+  if(gs.fog)drawFogOverlay(gs);
+  ctx.restore();
+  updateHUD(gs);
+}
+
+function drawBG(gs){
+  const t=gs.theme;
+  const sg=ctx.createLinearGradient(0,0,0,CH);
+  sg.addColorStop(0,t.sky[0]||'#040012');sg.addColorStop(1,t.sky[1]||'#0a0030');
+  ctx.fillStyle=sg;ctx.fillRect(0,0,CW,CH);
+
+  // Glitch scanlines
+  if(t.glitch&&Math.random()<.04){
+    ctx.fillStyle='rgba(255,0,255,.03)';
+    ctx.fillRect(0,Math.floor(Math.random()*CH),CW,rnd(2,10));
+  }
+
+  // BG particles
+  const sf=gs.timeSlow?.2:1;
+  for(const p of gs.bgParticles){
+    p.x+=p.vx*sf;p.y+=p.vy*sf;
+    if(p.y>CH)p.y=0;if(p.x<0)p.x=CW;if(p.x>CW)p.x=0;
+    ctx.globalAlpha=p.a;
+    ctx.fillStyle=p.type==='rain'?'rgba(100,160,255,.5)':p.type==='dust'?'rgba(200,150,80,.4)':'#fff';
+    ctx.fillRect(Math.floor(p.x),Math.floor(p.y),p.size,p.type==='rain'?7:p.size);
+  }
+  ctx.globalAlpha=1;
+
+  // City silhouette
+  const bc=t.sky[0]||'#040012';
+  [[0,58,170],[80,230,70],[200,195,80],[310,215,55],[400,195,72],[490,210,48],[570,190,75],[660,220,60],[750,200,70],[840,215,52],[900,195,60]].forEach(([bx,bh,bw])=>{
+    ctx.fillStyle=bc;ctx.fillRect(bx,CH-bh,bw,bh);
+    ctx.fillStyle=(t.glow||'#4444ff')+'18';
+    for(let wx=bx+4;wx<bx+bw-4;wx+=9)for(let wy=CH-bh+8;wy<CH-6;wy+=13)
+      if(Math.random()<.3)ctx.fillRect(wx,wy,4,6);
+  });
+
+  // Platforms
+  for(const pl of gs.platforms){
+    if(pl.ground){
+      const gg=ctx.createLinearGradient(0,pl.y,0,pl.y+pl.h);
+      gg.addColorStop(0,t.ground||'#0a0022');gg.addColorStop(1,'#030308');
+      ctx.fillStyle=gg;ctx.fillRect(pl.x,pl.y,pl.w,pl.h);
+      ctx.fillStyle=t.platTop||'#5010ff';ctx.fillRect(pl.x,pl.y,pl.w,3);
+    } else {
+      ctx.fillStyle=t.plat||'#1a0040';ctx.fillRect(pl.x,pl.y,pl.w,pl.h);
+      ctx.fillStyle=t.platTop||'#5010ff';ctx.fillRect(pl.x,pl.y,pl.w,3);
+      ctx.fillStyle=(t.plat||'#1a0040')+'88';
+      ctx.fillRect(pl.x+8,pl.y+pl.h,5,20);ctx.fillRect(pl.x+pl.w-13,pl.y+pl.h,5,20);
+    }
+  }
+}
+
+function drawEntity(gs,e,isPlayer){
+  let x=Math.floor(e.x),y=Math.floor(e.y);
+  const f=e.facing,tn=Date.now();
+  const bob=e.onGround?Math.sin(tn*.007*Math.max(.5,Math.abs(e.vx)))*1.8:0;
+  y+=bob;
+
+  if(isPlayer&&e.invisible){ctx.globalAlpha=.3;}
+  if(e.invincible>0&&Math.floor(e.invincible/80)%2===0){ctx.globalAlpha=0;}
+
+  // Shadow
+  ctx.globalAlpha*=.35;ctx.fillStyle='#000';
+  ctx.beginPath();ctx.ellipse(x+10,FLOOR_Y+31,10,3.5,0,0,Math.PI*2);ctx.fill();
+  if(isPlayer&&e.invisible)ctx.globalAlpha=.3;else ctx.globalAlpha=1;
+  if(e.invincible>0&&Math.floor(e.invincible/80)%2===0)ctx.globalAlpha=0;else if(isPlayer&&e.invisible)ctx.globalAlpha=.3;else ctx.globalAlpha=1;
+
+  // Skin colors
+  const skinCols={
+    default:{body:'#4488ff',dark:'#223388',arm:'#336699',visor:'#aadefff'},
+    neon:   {body:'#00ffcc',dark:'#006644',arm:'#008855',visor:'#ffffff'},
+    ghost:  {body:'#aaaacc',dark:'#444466',arm:'#555577',visor:'#ffffff'},
+    fire:   {body:'#ff4400',dark:'#882200',arm:'#cc3300',visor:'#ffff00'},
+    void:   {body:'#6600cc',dark:'#2a0055',arm:'#4400aa',visor:'#ff00ff'},
+  };
+  const sc=isPlayer?skinCols[e.skin]||skinCols.default:{body:'#ff4444',dark:'#882222',arm:'#993333',visor:'#ffaaaa'};
+
+  // Legs
+  const swing=e.onGround&&Math.abs(e.vx)>.5?Math.sin(tn*.016*Math.abs(e.vx))*5:0;
+  ctx.fillStyle=sc.dark;
+  ctx.fillRect(x+2,y+e.h-10,6,10);ctx.fillRect(x+e.w-8,y+e.h-10,6,10);
+  ctx.fillStyle=sc.body;
+  ctx.fillRect(x+2-swing,y+e.h-2,7,3);ctx.fillRect(x+e.w-9+swing,y+e.h-2,7,3);
+
+  // Body
+  ctx.fillStyle=sc.body;ctx.fillRect(x+2,y+8,e.w-4,e.h-18);
+  ctx.fillStyle=sc.dark;ctx.fillRect(x+4,y+10,e.w-8,3);
+
+  // Berserk glow
+  if(isPlayer&&e.berserk){
+    ctx.globalAlpha=.3+Math.sin(tn*.022)*.15;ctx.fillStyle='#ff2200';
+    ctx.fillRect(x-5,y-5,e.w+10,e.h+10);ctx.globalAlpha=1;
+  }
+  // Shield bubble
+  if(isPlayer&&e.shielded){
+    ctx.strokeStyle=`rgba(68,204,255,${.5+Math.sin(tn*.01)*.28})`;ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(x+10,y+15,22,0,Math.PI*2);ctx.stroke();
+  }
+  // Reflect shimmer
+  if(isPlayer&&e.reflecting){
+    ctx.strokeStyle=`rgba(255,255,255,${.6+Math.sin(tn*.02)*.3})`;ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(x+10,y+15,20,0,Math.PI*2);ctx.stroke();
+  }
+
+  // Head
+  ctx.fillStyle=sc.body;ctx.fillRect(x+2,y,e.w-4,12);
+  ctx.fillStyle=isPlayer?'#aadeff':'#ffaaaa';
+  ctx.fillRect(x+(f>0?e.w-10:4),y+3,6,5);
+  ctx.fillStyle=isPlayer?'rgba(100,220,255,.7)':'rgba(255,100,100,.7)';
+  ctx.fillRect(x+(f>0?e.w-9:5),y+4,4,3);
+
+  // Status glows
+  if(hasStat(e,'burn')){ctx.globalAlpha=.3+Math.sin(tn*.03)*.15;ctx.fillStyle='#ff6600';ctx.fillRect(x-2,y-2,e.w+4,e.h+4);ctx.globalAlpha=1;}
+  if(hasStat(e,'freeze')){ctx.globalAlpha=.4;ctx.fillStyle='#4488ff';ctx.fillRect(x-2,y-2,e.w+4,e.h+4);ctx.globalAlpha=1;}
+  if(hasStat(e,'poison')){ctx.globalAlpha=.3;ctx.fillStyle='#44ff44';ctx.fillRect(x-2,y-2,e.w+4,e.h+4);ctx.globalAlpha=1;}
+  if(hasStat(e,'stun')){ctx.globalAlpha=.4;ctx.fillStyle='#ffff00';ctx.fillRect(x-2,y-2,e.w+4,e.h+4);ctx.globalAlpha=1;}
+
+  // Arm + weapon
+  const w2=e.weapons[e.weapIdx];
+  const aimDx=isPlayer?(gs.mouse.x-(x+10)):(gs.player.x+10-(e.x+10));
+  const aimDy=isPlayer?(gs.mouse.y-(y+15)):(gs.player.y+15-(e.y+15));
+  const aimAngle=Math.atan2(aimDy,aimDx);
+  const aX=x+(f>0?e.w-2:4),aY=y+14;
+  ctx.fillStyle=sc.arm;ctx.fillRect(aX-(f>0?0:6),aY,6,5);
+  ctx.save();ctx.translate(aX+(f>0?3:-3),aY+2);ctx.rotate(aimAngle);
+  if(w2.cat==='melee'){
+    ctx.fillStyle='#aaaaaa';ctx.fillRect(-4,-2,(w2.range||40),4);
+    ctx.fillStyle='#cccccc';ctx.fillRect(-4,-3,8,6);
+  } else {
+    const gl=16;
+    ctx.fillStyle=w2.color||'#aaccff';ctx.fillRect(0,-2,gl,5);
+    ctx.fillStyle='#aaaaaa';ctx.fillRect(gl-2,-3,3,7);
+    // Spinup indicator
+    if(w2.spinup){
+      ctx.fillStyle=`rgba(255,220,0,${w2.spinLvl||0})`;ctx.fillRect(-2,-2,4,5);
+    }
+    // Muzzle flash
+    if(now()-w2.lastShot<(w2.rate||150)*.45){
+      ctx.fillStyle='#fff8aa';ctx.fillRect(gl+1,-5,9,11);
+      ctx.fillStyle='#ffdd44';ctx.fillRect(gl+2,-3,6,7);
+    }
+  }
+  ctx.restore();
+
+  // Wall slide indicator
+  if(isPlayer&&e.wallSliding){
+    ctx.fillStyle='rgba(100,180,255,.6)';
+    ctx.fillRect(x+(e.wallDir<0?-3:e.w),y,3,e.h);
+  }
+
+  ctx.globalAlpha=1;
+}
+
+function drawDecoys(gs){
+  for(const d of gs.decoys){
+    const remain=(d.end-now())/4000;
+    ctx.globalAlpha=clmp(remain,.1,.7);
+    ctx.fillStyle='#ffaa44';
+    ctx.fillRect(Math.floor(d.x+2),Math.floor(d.y),14,12);
+    ctx.fillRect(Math.floor(d.x+2),Math.floor(d.y+8),14,20);
+    ctx.globalAlpha=1;
+  }
+}
+
+function drawBullets(gs){
+  for(const b of gs.bullets){
+    if(b.type==='grenade'){
+      const blink=b.timer<700&&Math.floor(Date.now()/90)%2===0;
+      ctx.fillStyle=blink?'#ffff00':'#558833';
+      ctx.fillRect(Math.floor(b.x-4),Math.floor(b.y-5),8,8);
+      ctx.fillStyle='#888';ctx.fillRect(Math.floor(b.x-1),Math.floor(b.y-9),3,4);
+      continue;
+    }
+    for(let ti=0;ti<b.trail.length;ti++){
+      ctx.globalAlpha=(ti/b.trail.length)*.5;
+      ctx.fillStyle=b.color;ctx.fillRect(Math.floor(b.trail[ti].x-1.5),Math.floor(b.trail[ti].y-1.5),3,3);
+    }
+    ctx.globalAlpha=1;ctx.fillStyle=b.color;
+    if(b.explosive){ctx.fillRect(Math.floor(b.x-5),Math.floor(b.y-5),10,10);ctx.fillStyle='#ffaa44';ctx.fillRect(Math.floor(b.x-3),Math.floor(b.y-3),6,6);}
+    else{ctx.fillRect(Math.floor(b.x-2),Math.floor(b.y-1.5),b.bouncy>0?5:4,3);}
+  }
+  ctx.globalAlpha=1;
+}
+
+function drawBlackholes(gs){
+  for(const bh of gs.blackholes){
+    for(let r2=bh.r;r2>0;r2-=14){
+      ctx.globalAlpha=(1-r2/bh.r)*.5;ctx.strokeStyle='#8800ff';ctx.lineWidth=2;
+      ctx.beginPath();ctx.arc(bh.x,bh.y,r2,0,Math.PI*2);ctx.stroke();
+    }
+    ctx.globalAlpha=.85;ctx.fillStyle='#110022';
+    ctx.beginPath();ctx.arc(bh.x,bh.y,13,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=1;
+  }
+}
+
+function drawParticles(gs){
+  for(const p of gs.particles){
+    if(p.type==='dmgnum')continue;
+    ctx.globalAlpha=clmp(p.life/p.maxLife,0,1);
+    ctx.fillStyle=p.color;
+    ctx.fillRect(Math.floor(p.x-p.size/2),Math.floor(p.y-p.size/2),Math.ceil(p.size),Math.ceil(p.size));
+  }
+  ctx.globalAlpha=1;
+}
+function drawDmgNums(gs){
+  for(const p of gs.particles){
+    if(p.type!=='dmgnum')continue;
+    ctx.globalAlpha=p.life/55;ctx.fillStyle=p.color;
+    ctx.font=`${p.crit?'bold ':''} ${p.crit?17:13}px 'VT323',monospace`;
+    ctx.fillText(p.crit?`CRIT! ${p.val}`:`-${p.val}`,Math.floor(p.x),Math.floor(p.y));
+  }
+  ctx.globalAlpha=1;
+}
+function drawExplosions(gs){
+  for(const e of gs.explosions){
+    const a=e.life/30;
+    ctx.globalAlpha=a*.5;ctx.fillStyle='#ff8822';
+    ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=a*.65;ctx.fillStyle='#ffee44';
+    ctx.beginPath();ctx.arc(e.x,e.y,e.r*.45,0,Math.PI*2);ctx.fill();
+    ctx.globalAlpha=1;
+  }
+}
+function drawReloadBar(gs){
+  const w=gs.player.weapons[gs.player.weapIdx];
+  if(!w.reloading)return;
+  const prog=clmp(1-(w.reloadEnd-now())/w.reload,0,1);
+  const bw=46,bx=gs.player.x+10-bw/2,by=gs.player.y-20;
+  ctx.fillStyle='#111';ctx.fillRect(bx,by,bw,5);
+  ctx.fillStyle='#ffaa22';ctx.fillRect(bx,by,bw*prog,5);
+  ctx.font='5px "Press Start 2P",monospace';ctx.fillStyle='#fff';ctx.fillText('RELOAD',bx+2,by+14);
+}
+function drawTimeslowOverlay(){
+  ctx.fillStyle='rgba(80,20,170,.07)';ctx.fillRect(0,0,CW,CH);
+  ctx.font='7px "Press Start 2P",monospace';ctx.fillStyle='rgba(160,80,255,.55)';ctx.fillText('⬡ TIME SLOW',8,20);
+}
+function drawFogOverlay(gs){
+  const p=gs.player;
+  const grad=ctx.createRadialGradient(p.x+10,p.y+15,80,p.x+10,p.y+15,260);
+  grad.addColorStop(0,'transparent');grad.addColorStop(1,'rgba(0,0,10,.94)');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,CW,CH);
+}
+function drawFields(gs){}
+
+// ── HUD ──────────────────────────────────────────────────────
+function buildAbilityBar(gs){
+  const row=document.getElementById('ab-row');row.innerHTML='';
+  gs.player.abilities.forEach((ab,i)=>{
+    const el=document.createElement('div');
+    el.className='ab-slot';el.id='ab'+i;
+    el.style.borderColor=ab.def.color+'55';
+    el.innerHTML=`<div class="ab-key">${i+1}</div>${ab.def.icon}<div class="ab-label">${(LANG==='tr'?ab.def.nameTR:ab.def.name).split(' ')[0]}</div><div class="ab-cd" id="acd${i}" style="height:0%"></div>`;
+    row.appendChild(el);
+  });
+}
+
+function buildFogOverlay(gs){
+  document.getElementById('ovl-fog').style.opacity=0;// fog handled on canvas
+}
+
+function updateHUD(gs){
+  const p=gs.player,e=gs.enemy,pw=p.weapons[p.weapIdx];
+  setPct('ph-hp',p.hp/p.maxHp*100);setPct('ph-en',p.energy/p.maxEnergy*100);
+  const amPct=isFinite(pw.ammoMax)?pw.ammoLeft/pw.ammoMax*100:100;
+  setPct('ph-am',amPct);
+  document.getElementById('pv-hp').textContent=Math.ceil(p.hp);
+  document.getElementById('pv-en').textContent=Math.ceil(p.energy);
+  document.getElementById('pv-am').textContent=isFinite(pw.ammoMax)?pw.ammoLeft+'/'+pw.ammoMax:'∞';
+  document.getElementById('p-wname').textContent=LANG==='tr'?pw.nameTR:pw.name;
+  document.getElementById('p-wdot').className=`rdot ${RARITY_DOT[pw.rarity]}`;
+  setPct('eh-hp',Math.max(0,e.hp/e.maxHp*100));
+  document.getElementById('ev-hp').textContent=Math.ceil(Math.max(0,e.hp));
+  const ew=e.weapons[e.weapIdx];
+  document.getElementById('e-wname').textContent=LANG==='tr'?ew.nameTR:ew.name;
+  document.getElementById('e-wdot').className=`rdot ${RARITY_DOT[ew.rarity]}`;
+  document.getElementById('hud-score').textContent=String(gs.score).padStart(6,'0');
+  document.getElementById('hud-wave').textContent=`${t('wave')} ${gs.wave}`;
+
+  // Combo
+  const comboEl=document.getElementById('hud-combo');
+  if(gs.combo>2){
+    const lvl=gs.combo>=30?'LEGENDARY':gs.combo>=15?'EPIC':gs.combo>=8?'GREAT':'GOOD';
+    comboEl.textContent=`${gs.combo}× COMBO ${lvl}`;
+    comboEl.style.color=gs.combo>=30?'#ffcc28':gs.combo>=15?'#a030ff':gs.combo>=8?'#2970ff':'#28e868';
+  } else comboEl.textContent='';
+
+  // Status pips
+  const statIcons={burn:'🔥',freeze:'❄️',stun:'⭐',poison:'☠️',bleed:'🩸',slow:'🐌'};
+  const n=now();
+  document.getElementById('p-stats').innerHTML=p.statuses.filter(s=>s.end>n).map(s=>`<span class="stat-pip">${statIcons[s.type]||'?'}</span>`).join('');
+  document.getElementById('e-stats').innerHTML=e.statuses.filter(s=>s.end>n).map(s=>`<span class="stat-pip">${statIcons[s.type]||'?'}</span>`).join('');
+
+  // Ability cooldowns
+  gs.player.abilities.forEach((ab,i)=>{
+    const cdEl=document.getElementById('acd'+i);if(cdEl)cdEl.style.height=clmp(ab.cd/ab.def.cd*100,0,100)+'%';
+    const slot=document.getElementById('ab'+i);
+    if(slot)slot.className='ab-slot'+(ab.cd>0?' ab-oncd':' ab-ready')+(ab.active?' ab-active':'');
+  });
+
+  // Combo timer decay
+  if(gs.combo>0){gs.comboTimer-=16;if(gs.comboTimer<=0){gs.combo=0;gs.comboTimer=0;}}
+}
+
+function setPct(id,v){const el=document.getElementById(id);if(el)el.style.width=clmp(v,0,100)+'%';}
+
+// ── KILL FEED ────────────────────────────────────────────────
+function kf(msg,type=''){
+  const feed=document.getElementById('kill-feed');
+  const el=document.createElement('div');el.className='kf-item';
+  el.style.color=type==='legendary'?'#ffcc28':type==='good'?'#28e868':type==='info'?'#4488ff':'#ff6060';
+  el.textContent=msg;feed.appendChild(el);
+  setTimeout(()=>{el.style.opacity=0;setTimeout(()=>el.remove(),2500);},2000);
+}
+
+// ── GAME LOOP ────────────────────────────────────────────────
+function gameLoop(ts){
+  if(!GS||!GS.running)return;
+  const dt=clmp(ts-GS.lastFrame,1,50);GS.lastFrame=ts;
+  updatePlayer(GS,dt);
+  if(GS.enemy.hp>0)updateEnemy(GS,dt);
+  updateBullets(GS,dt);
+  updateParticles(GS,dt);
+  drawFrame(GS);
+  animId=requestAnimationFrame(gameLoop);
+}
+
+// ── END GAME ────────────────────────────────────────────────
+function endGame(gs,won){
+  if(animId)cancelAnimationFrame(animId);
+  document.getElementById('ovl-slow').style.opacity=0;
+  document.getElementById('ovl-dmg').style.background='none';
+  document.onkeydown=null;document.onkeyup=null;
+  gc.onmousemove=null;gc.onmousedown=null;gc.onmouseup=null;
+
+  const xpGain=Math.floor(gs.score/80)+(won?250:60)+gs.wave*40;
+  const lvlUp=addXP(xpGain);
+  if(gs.score>PROG.hiScore){PROG.hiScore=gs.score;}
+  saveProg();
+
+  document.getElementById('ov-title').textContent=won?t('victory'):t('defeated');
+  document.getElementById('ov-title').style.color=won?'#28e868':'#ff2a4a';
+  document.getElementById('ov-score').textContent=`${t('score')}: ${gs.score}`;
+  document.getElementById('ov-wave').textContent=`${t('wave')}: ${gs.wave} | HI: ${PROG.hiScore}`;
+  document.getElementById('ov-xp').textContent=`+${xpGain} ${t('xp_earned')} → LV ${PROG.level}`;
+
+  const s=gs.stats;
+  const acc=s.shots>0?Math.round(s.hits/s.shots*100):0;
+  const dur=Math.round((now()-gs.startTime)/1000);
+  document.getElementById('ov-stats').innerHTML=`
+    <div class="stat-card"><div class="sc-label">${t('stat_score')}</div><div class="sc-val">${gs.score}</div></div>
+    <div class="stat-card"><div class="sc-label">${t('stat_wave')}</div><div class="sc-val">${gs.wave}</div></div>
+    <div class="stat-card"><div class="sc-label">${t('stat_dmg')}</div><div class="sc-val">${s.dmgDealt}</div></div>
+    <div class="stat-card"><div class="sc-label">${t('stat_acc')}</div><div class="sc-val">${acc}%</div><div class="sc-sub">${s.hits}/${s.shots}</div></div>
+    <div class="stat-card"><div class="sc-label">${t('stat_combo')}</div><div class="sc-val">${s.bestCombo}×</div></div>
+    <div class="stat-card"><div class="sc-label">${t('stat_time')}</div><div class="sc-val">${dur}s</div></div>
+  `;
+  showScr('scr-over');
+}
+
+// ───────────────────────────────────────────────────────────────────────
+// INIT
+// ───────────────────────────────────────────────────────────────────────
+setLang(LANG);
+setDiff('normal');
+renderProgScreen();
+codexTab('weapons');
+
+// Resize canvas to window
+function resizeCanvas(){
+  const scale=Math.min(window.innerWidth/CW,window.innerHeight/(CH+120));
+  gc.style.width=(CW*scale)+'px';gc.style.height=(CH*scale)+'px';
+}
+window.addEventListener('resize',resizeCanvas);resizeCanvas();
+</script>
+</body>
+</html>
