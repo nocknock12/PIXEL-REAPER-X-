@@ -704,6 +704,8 @@ const MODIFIER_DEFS = [
   { id:'bullet_rain',   icon:'🌧️', name:'BULLET RAIN',   desc:'Enemy fires 50% faster',color:'#ff6060'},
   { id:'chaos_mode',    icon:'🎲', name:'CHAOS MODE',    desc:'Random effects every 5s',color:'#ff88ff'},
   { id:'magnet_bullets',icon:'🧲', name:'HOMING SHOTS',  desc:'Bullets slightly home', color:'#44aaff'},
+  { id:'high_speed',    icon:'🏎️', name:'HIGH SPEED',    desc:'Everything moves 1.8×', color:'#ff9900'},
+  { id:'mini_boss_wave',icon:'💪', name:'ELITE ENEMY',   desc:'Boss enemy, big HP, new AI patterns', color:'#ff0080'},
 ];
 
 // ── RARITY COLORS ────────────────────────────────────────────
@@ -870,10 +872,21 @@ function drawMapPreview(theme) {
   const sg=cx.createLinearGradient(0,0,0,H2);
   sg.addColorStop(0,theme.sky[0]); sg.addColorStop(1,theme.sky[1]);
   cx.fillStyle=sg; cx.fillRect(0,0,W2,H2);
-  cx.fillStyle=theme.plat;
-  [[0,60,W2,20],[40,42,70,8],[110,34,70,8],[180,42,60,8]].forEach(([x,y,w,h])=>{
+  // Preview platforms from current lobby if available
+  const previewPlats = [[0,60,W2,20],[40,42,70,8],[110,34,70,8],[180,42,60,8]];
+  const specPreviews = [null,'launch','speed','slow','hazard','vanish'];
+  previewPlats.forEach(([x,y,w,h],i)=>{
+    const spec = specPreviews[i] || null;
+    const col = spec ? SPECIAL_TILE_COLORS[spec] : theme.plat;
+    cx.fillStyle=col;
     cx.fillRect(x,y,w,h);
-    cx.fillStyle=theme.platTop; cx.fillRect(x,y,w,2); cx.fillStyle=theme.plat;
+    cx.fillStyle=spec?col+'cc':theme.platTop; cx.fillRect(x,y,w,2);
+  });
+  // Legend
+  cx.font='8px monospace';
+  const legendItems=[['↑','#44ffaa','Launch'],['»','#ffff22','Speed'],['~','#aa44ff','Slow'],['☠','#ff3030','Hazard'],['?','#ff88ff','Vanish']];
+  legendItems.forEach(([icon,color,label],i)=>{
+    cx.fillStyle=color; cx.fillText(icon+label, 2+i*47, 78);
   });
 }
 
@@ -932,12 +945,13 @@ function _baseInitGame(lobby) {
   const platforms = generatePlatforms();
 
   const gravMult   = hasMod('low_grav')      ? 0.45 : 1;
-  const speedMult  = hasMod('double_speed')  ? 2    : 1;
+  const speedMult  = hasMod('double_speed')  ? 2    : hasMod('high_speed') ? 1.8 : 1;
   const jumpMult   = hasMod('super_jump')    ? 1.7  : 1;
   const glassCannon= hasMod('glass_cannon');
   const lifeSteal  = hasMod('shield_leech');
   const bigHead    = hasMod('giant_heads');
   const oneShot    = hasMod('one_shot');
+  const isMiniBoss = hasMod('mini_boss_wave');
 
   GS = {
     lobby, diff, theme: lobby.theme,
@@ -969,8 +983,9 @@ function _baseInitGame(lobby) {
     enemy: {
       x:720, y:350, w:18, h:28,
       vx:0, vy:0, onGround:false, facing:-1,
-      hp: 150 * diff.hpMult,
-      maxHp: 150 * diff.hpMult,
+      hp: (isMiniBoss ? 320 : 150) * diff.hpMult,
+      maxHp: (isMiniBoss ? 320 : 150) * diff.hpMult,
+      isMiniBoss,
       weapons:eWeapons, weapIdx:0,
       statuses:[],
       invincible:0,
@@ -995,15 +1010,103 @@ function _baseInitGame(lobby) {
   animId = requestAnimationFrame(gameLoop);
 }
 
+// ── SPECIAL TILE TYPES ────────────────────────────────────────
+// type: 'launch' = jump pad, 'speed' = speed boost, 'slow' = sticky zone,
+//        'vanish' = blinks on/off, 'hazard' = damages player/enemy
+const SPECIAL_TILE_TYPES = ['launch','speed','slow','vanish','hazard'];
+const SPECIAL_TILE_COLORS = {
+  launch:'#44ffaa', speed:'#ffff22', slow:'#aa44ff', vanish:'#ff88ff', hazard:'#ff3030'
+};
+
 function generatePlatforms() {
   const FLOOR = 380;
   const plats = [{ x:0, y:FLOOR+28, w:W, h:100, ground:true }];
-  const configs = [[130,300],[370,258],[620,300],[255,198],[505,198],[780,260],[50,200]];
-  configs.forEach(([px,py]) => {
-    const pw = rndInt(110,160);
-    plats.push({ x:px, y:py, w:pw, h:14 });
-  });
+
+  // Procedurally generated platform layout — different each run
+  const numPlats = rndInt(5, 9);
+  const usedRects = [];
+
+  for (let attempt=0; attempt<200 && plats.length-1<numPlats; attempt++) {
+    const pw = rndInt(90,180);
+    const px = rndInt(20, W-pw-20);
+    const py = rndInt(140, 340);
+
+    // Avoid overlap
+    let overlap = false;
+    for (const r of usedRects) {
+      if (px<r.x+r.w+20 && px+pw>r.x-20 && Math.abs(py-r.y)<50) { overlap=true; break; }
+    }
+    if (overlap) continue;
+    usedRects.push({x:px,y:py,w:pw});
+
+    // Assign special tile type with ~35% chance
+    const specialRoll = Math.random();
+    let specialType = null;
+    if (specialRoll < 0.35) {
+      specialType = pick(SPECIAL_TILE_TYPES);
+    }
+
+    plats.push({
+      x:px, y:py, w:pw, h:14,
+      special: specialType,
+      // vanish platforms blink state
+      vanishOn: true,
+      vanishTimer: 0,
+      vanishPeriod: rndInt(1800, 3500),
+    });
+  }
+
   return plats;
+}
+
+// Update vanishing platform timers
+function updatePlatforms(gs, dt) {
+  for (const p of gs.platforms) {
+    if (!p.special || p.ground) continue;
+    if (p.special === 'vanish') {
+      p.vanishTimer += dt;
+      if (p.vanishTimer >= p.vanishPeriod) {
+        p.vanishTimer = 0;
+        p.vanishOn = !p.vanishOn;
+      }
+    }
+    if (p.special === 'hazard') {
+      // Damage any entity standing on this platform
+      [gs.player, gs.enemy].forEach(e => {
+        const onPlat = e.x+9>p.x && e.x+9<p.x+p.w && Math.abs((e.y+e.h)-p.y)<8 && e.vy>=0;
+        const readyToTick = !p._lastHazardTick || (Date.now()-(p._lastHazardTick||0)>600);
+        if (onPlat && readyToTick) {
+          p._lastHazardTick=Date.now();
+          const isPlayer = e === gs.player;
+          const d = rndInt(4,10);
+          if (isPlayer) damagePlayer(gs,d);
+          else { damageEnemy(gs,d); spawnDmgNum(gs,e.x+9,e.y,d,'#ff3030',false); }
+          burst(e.x+9,e.y+e.h,'#ff3030',4,2);
+        }
+      });
+    }
+    if (p.special === 'launch' || p.special === 'speed' || p.special === 'slow') {
+      [gs.player, gs.enemy].forEach(e => {
+        const justLanded = e.x+9>p.x && e.x+9<p.x+p.w && Math.abs((e.y+e.h)-p.y)<8 && e.onGround;
+        if (!justLanded) return;
+        const key = `_tile_${p.special}_${p.x}_${p.y}`;
+        const now = Date.now();
+        if (p.special === 'launch' && (!e[key] || now-e[key]>500)) {
+          e[key]=now; e.vy = -20; // strong upward launch
+          burst(e.x+9,e.y+e.h,'#44ffaa',10,4);
+          if (e===gs.player) kf('🚀 LAUNCH PAD!','good');
+        }
+        if (p.special === 'speed' && (!e[key] || now-e[key]>200)) {
+          e[key]=now; e.vx *= 2.2; e.vx = clamp(e.vx,-22,22);
+          burst(e.x+9,e.y+e.h,'#ffff22',6,3);
+          if (e===gs.player) kf('⚡ SPEED BOOST!','good');
+        }
+        if (p.special === 'slow') {
+          e.vx *= 0.4; if (e===gs.player) kf('🕸 STICKY ZONE!','info');
+        }
+      });
+    }
+  }
 }
 
 function generateBgParticles(theme) {
@@ -1223,6 +1326,8 @@ function physicsStep(e, gs, dt) {
   e.y+=e.vy*sf*(dt/16);
   e.onGround=false;
   for (const p of gs.platforms) {
+    // Vanish platforms are intangible when invisible
+    if (p.special==='vanish' && !p.vanishOn) continue;
     if (e.x+e.w>p.x&&e.x<p.x+p.w) {
       if (e.y+e.h>=p.y&&e.y+e.h<=p.y+p.h+Math.abs(e.vy)+6&&e.vy>=0) {
         e.y=p.y-e.h; e.vy=0; e.onGround=true;
@@ -1667,10 +1772,17 @@ function damageEnemy(gs, dmg) {
   if (e.invincible>0) return;
   e.hp=Math.max(0,e.hp-dmg);
   e.invincible=180;
+  // Knockback from damage
+  const kbDir = gs.player.x < e.x ? 1 : -1;
+  e.vx += kbDir * clamp(dmg*0.08, 0.5, 5);
   gs.score+=dmg*10*Math.max(1,gs.combo);
   gs.combo++;
   const hasComboMaster=gs.player.abilities.some(a=>a.def?.passive&&a.key==='COMBO_MASTER');
   gs.comboTimer=3000*(hasComboMaster?1.5:1);
+  // Screen shake on heavy hits
+  if (dmg >= 50 && !gs._screenShake) {
+    gs._screenShake = { dur:200, intensity:6 };
+  }
   if (e.hp<=0&&gs.running) {
     gs.running=false;
     gs.score+=1000*gs.wave;
@@ -1728,6 +1840,17 @@ function updateParticles(gs,dt) {
 // ── DRAWING ──────────────────────────────────────────────────
 function drawFrame(gs) {
   ctx.clearRect(0,0,W,H);
+
+  // Screen shake
+  const shaking = gs._screenShake && gs._screenShake.dur > 0;
+  if (shaking) {
+    const sh = gs._screenShake;
+    ctx.save();
+    ctx.translate((Math.random()-0.5)*sh.intensity, (Math.random()-0.5)*sh.intensity);
+    sh.dur -= 16;
+    if (sh.dur <= 0) gs._screenShake = null;
+  }
+
   drawBg(gs);
   drawBullets(gs);
   drawBlackholes(gs);
@@ -1740,6 +1863,8 @@ function drawFrame(gs) {
   drawReloadBar(gs);
   if (gs.timeSlow) drawTimeslowFx(gs);
   updateHUD(gs);
+
+  if (shaking) ctx.restore();
 }
 
 function drawBg(gs) {
@@ -1781,10 +1906,27 @@ function drawBg(gs) {
       ctx.fillStyle=gg; ctx.fillRect(p.x,p.y,p.w,p.h);
       ctx.fillStyle=t.platTop; ctx.fillRect(p.x,p.y,p.w,3);
     } else {
-      ctx.fillStyle=t.plat; ctx.fillRect(p.x,p.y,p.w,p.h);
-      ctx.fillStyle=t.platTop; ctx.fillRect(p.x,p.y,p.w,3);
-      ctx.fillStyle=t.plat+'88';
+      // Vanish platforms - skip drawing if off
+      if (p.special==='vanish') {
+        const pulse=0.4+Math.sin(Date.now()*0.006)*0.3;
+        if (!p.vanishOn) { ctx.globalAlpha=0.15; }
+        else { ctx.globalAlpha=pulse; }
+      }
+      const specColor = p.special ? SPECIAL_TILE_COLORS[p.special] : null;
+      ctx.fillStyle=specColor||t.plat; ctx.fillRect(p.x,p.y,p.w,p.h);
+      ctx.fillStyle=specColor?specColor+'cc':t.platTop; ctx.fillRect(p.x,p.y,p.w,3);
+      ctx.globalAlpha=1;
+      ctx.fillStyle=(specColor||t.plat)+'88';
       ctx.fillRect(p.x+8,p.y+p.h,5,18); ctx.fillRect(p.x+p.w-13,p.y+p.h,5,18);
+      // Special tile icon
+      if (p.special && (p.special!=='vanish'||p.vanishOn)) {
+        const icons={launch:'↑',speed:'»',slow:'~',hazard:'☠',vanish:'?'};
+        ctx.font='10px "VT323",monospace';
+        ctx.fillStyle=specColor||'#fff';
+        ctx.globalAlpha=0.85;
+        ctx.fillText(icons[p.special]||'',p.x+p.w/2-4,p.y+12);
+        ctx.globalAlpha=1;
+      }
     }
   }
 }
@@ -1797,9 +1939,19 @@ function drawEntity(gs,e,isPlayer) {
   if (e.invincible>0&&Math.floor(e.invincible/70)%2===0) return;
 
   const hasShield=isPlayer&&gs.player.abilities.some(a=>(a.key==='SHIELD'||a.key==='AEGIS'||a.key==='DIVINE_SHIELD')&&a.active&&Date.now()<a.activeEnd);
-  const col=isPlayer?(e.berserk?'#ff2200':hasShield?'#44ccff':'#4488ff'):'#ff4444';
-  const dark=isPlayer?'#223388':'#882222';
-  const arm=isPlayer?'#336699':'#993333';
+  const isBoss = !isPlayer && gs.enemy.isMiniBoss;
+  const bossScale = isBoss ? 1.45 : 1;
+  const col=isPlayer?(e.berserk?'#ff2200':hasShield?'#44ccff':'#4488ff'):(isBoss?'#ff0066':'#ff4444');
+  const dark=isPlayer?'#223388':(isBoss?'#880033':'#882222');
+  const arm=isPlayer?'#336699':(isBoss?'#cc0044':'#993333');
+
+  // Mini-boss glow ring
+  if (isBoss) {
+    ctx.globalAlpha=0.18+Math.sin(Date.now()*0.008)*0.1;
+    ctx.fillStyle='#ff0066';
+    ctx.beginPath(); ctx.arc(x+9,y+14,26*bossScale,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+  }
 
   // Shadow
   ctx.globalAlpha=0.35; ctx.fillStyle='#000';
@@ -2060,6 +2212,7 @@ function gameLoop(ts) {
   if (GS.enemy.hp>0) updateEnemy(GS,dt);
   updateBullets(GS,dt);
   updateParticles(GS,dt);
+  updatePlatforms(GS,dt);
   drawFrame(GS);
   animId=requestAnimationFrame(gameLoop);
 }
